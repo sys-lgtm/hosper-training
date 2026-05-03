@@ -382,11 +382,42 @@ FB_MCQ.on('value',function(s){var m=s.val();if(m&&Array.isArray(m)&&m.length>0){
 FB_RES.on('value',function(s){var r=s.val();D.res=r?(Array.isArray(r)?r:Object.values(r)):[];});
 }
 function save(){FB_MCQ.set(D.mcq);FB_RES.set(D.res);FB_CFG.set(D.cfg);try{localStorage.setItem('hc',JSON.stringify(D.cfg));}catch(e){}showSync('✓ Synced!','#388E3C');}
-function applyLogo(){var lg=D.cfg.logo;if(lg){['l','al','t','ab'].forEach(function(x){var el=document.getElementById('logo-'+x);var fb=document.getElementById('logo-'+x+'f');if(el){el.src=lg;el.classList.remove('hi');}if(fb)fb.classList.add('hi');});var lp=document.getElementById('lp-img');if(lp){lp.src=lg;document.getElementById('lp-area').classList.remove('hi');}}}
+function applyLogo(){if(!D.cfg)return;var lg=D.cfg.logo;if(lg){['l','al','t','ab'].forEach(function(x){var el=document.getElementById('logo-'+x);var fb=document.getElementById('logo-'+x+'f');if(el){el.src=lg;el.classList.remove('hi');}if(fb)fb.classList.add('hi');});var lp=document.getElementById('lp-img');if(lp){lp.src=lg;document.getElementById('lp-area').classList.remove('hi');}}}
 function rmLogo(){D.cfg.logo=null;document.getElementById('s-logo').value='';document.getElementById('lp-area').classList.add('hi');['l','al','t','ab'].forEach(function(x){var el=document.getElementById('logo-'+x);var fb=document.getElementById('logo-'+x+'f');if(el)el.classList.add('hi');if(fb)fb.classList.remove('hi');});}
 function upLogo(inp){var f=inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(e){D.cfg.logo=e.target.result;applyLogo();};r.readAsDataURL(f);}
 function ss(id){document.querySelectorAll('.sc').forEach(function(s){s.classList.add('hi');});document.getElementById(id).classList.remove('hi');}
-function aLogin(){if(document.getElementById('iapwd').value===D.cfg.pwd){document.getElementById('iapwd').value='';ss('sad');sTab('r');}else alert('Galat password!');}
+function aLogin(){
+  var entered = document.getElementById('iapwd').value;
+  // Check against loaded config, fallback to default
+  var pwd = (D.cfg && D.cfg.pwd) ? D.cfg.pwd : 'hosper2024';
+  if(entered === pwd){
+    document.getElementById('iapwd').value='';
+    ss('sad');
+    sTab('r');
+  } else {
+    // Try fetching fresh from Firebase in case not loaded yet
+    FB_CFG.once('value').then(function(s){
+      var c = s.val();
+      var fbpwd = (c && c.pwd) ? c.pwd : 'hosper2024';
+      if(entered === fbpwd){
+        if(c) D.cfg = Object.assign(D.cfg, c);
+        document.getElementById('iapwd').value='';
+        ss('sad');
+        sTab('r');
+      } else {
+        alert('Galat password!');
+      }
+    }).catch(function(){
+      if(entered === 'hosper2024'){
+        document.getElementById('iapwd').value='';
+        ss('sad');
+        sTab('r');
+      } else {
+        alert('Galat password!');
+      }
+    });
+  }
+}
 function mBgClick(e,id){if(e.target.id===id)document.getElementById(id).classList.add('hi');}
 function getAS(){return D.rSecs?D.rSecs.map(function(i){return D.mcq[i];}):D.mcq;}
 function startTest(rSecs){var nm=document.getElementById('iname').value.trim();var mb=document.getElementById('imob').value.trim();if(!nm){alert('Naam zaroori hai!');return;}if(!mb||mb.replace(/\D/g,'').length<10){alert('Sahi 10 digit mobile daalein!');return;}D.cand={name:nm,empId:document.getElementById('iempid').value.trim()||'-',mobile:mb,date:new Date().toLocaleDateString('en-IN')};D.rSecs=rSecs||null;D.ans={};var secs=getAS();for(var i=0;i<secs.length;i++)D.ans[i]={};D.cur=0;ss('st');rTest();}
@@ -415,7 +446,7 @@ function addSec(){var n=document.getElementById('ns-name').value.trim();if(!n){a
 function delSec(si){conf('"'+D.mcq[si].section+'" delete karein?',D.mcq[si].questions.length+' questions bhi delete honge.',function(){D.mcq.splice(si,1);save();rQTab();});}
 function addQ(si){var txt=document.getElementById('nq-'+si).value.trim();if(!txt){alert('Question likhein!');return;}var opts=[],ci=-1;document.querySelectorAll('input[name="nr-'+si+'"]').forEach(function(r,i){if(r.checked)ci=i;});for(var i=0;i<4;i++){var v=document.getElementById('no-'+si+'-'+i).value.trim();if(!v){alert('Saare 4 options bharein!');return;}opts.push({text:v,correct:i===ci});}if(ci===-1){alert('Sahi answer ke radio pe click karein!');return;}D.mcq[si].questions.push({question:txt,options:opts});save();rQTab();setTimeout(function(){var ab=document.getElementById('ab-'+si);if(ab&&!ab.classList.contains('op')){ab.classList.add('op');document.getElementById('av-'+si).textContent='▲';}},50);}
 function delQ(si,qi){conf('Question delete karein?','"'+D.mcq[si].questions[qi].question.substring(0,50)+'..."',function(){D.mcq[si].questions.splice(qi,1);save();rQTab();});}
-function saveSets(){var p=parseFloat(document.getElementById('s-pct').value);if(p<1||p>100){alert('1-100 ke beech daalein');return;}D.cfg.pp=p;var np=document.getElementById('s-pwd').value.trim();if(np)D.cfg.pwd=np;save();applyLogo();document.getElementById('s-pwd').value='';alert('Settings save! ✓');}
+function saveSets(){var p=parseFloat(document.getElementById('s-pct').value);if(p<1||p>100){alert('1-100 ke beech daalein');return;}if(!D.cfg)D.cfg={};D.cfg.pp=p;var np=document.getElementById('s-pwd').value.trim();if(np)D.cfg.pwd=np;save();applyLogo();document.getElementById('s-pwd').value='';alert('Settings save! ✓');}
 function conf(title,sub,cb){document.getElementById('c-title').textContent=title;document.getElementById('c-sub').textContent=sub;document.getElementById('m-conf').classList.remove('hi');document.getElementById('c-yes').onclick=function(){document.getElementById('m-conf').classList.add('hi');cb();};}
 function expCSV(){if(!D.res.length){alert('Koi data nahi!');return;}var rows=[['Name','EMP','Mobile','Date','Score','Max','Pct','Status','Type']];D.res.forEach(function(r){rows.push(['"'+r.name+'"',r.empId,r.mobile,r.date,r.total,r.max,r.pct+'%',r.status,r.isR?'Retake':'First']);});var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(rows.map(function(r){return r.join(',');}).join('\n'));a.download='hosper_results.csv';a.click();}
 load();
