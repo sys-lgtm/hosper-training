@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hosper Training Test</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',Arial,sans-serif;background:#FFF5F5;color:#2D1515;min-height:100vh}
+:root{--r:#A81628;--rs:#C62020;--rl:#FFEBEE;--rm:#FFCDD2;--rp:#FFF5F5;--w:#fff;--g1:#f7f0f0;--g2:#ede0e0;--sh:0 4px 20px rgba(168,22,40,.12)}
+.hi{display:none!important}
+.sc{min-height:100vh;display:flex;flex-direction:column}
+/* --- BTNS --- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border-radius:10px;border:none;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
+.bp{background:var(--r);color:#fff;box-shadow:0 4px 14px rgba(168,22,40,.3)}.bp:hover{background:var(--rs);transform:translateY(-1px)}
+.bo{background:#fff;color:var(--r);border:2px solid var(--rm)}.bo:hover{border-color:var(--r);background:var(--rp)}
+.bg{background:transparent;color:#7a5050;border:1.5px solid var(--g2)}.bg:hover{background:var(--g1)}
+.bs{background:#388E3C;color:#fff}.bs:hover{background:#2E7D32}
+.bw{width:100%;padding:13px}
+.bsm{padding:5px 12px;font-size:12px;border-radius:8px}
+/* --- INPUTS --- */
+.inp{width:100%;padding:11px 14px;border:2px solid var(--g2);border-radius:10px;font-family:inherit;font-size:14px;color:#2D1515;background:#fff;outline:none;transition:.2s}
+.inp:focus{border-color:var(--r);box-shadow:0 0 0 3px rgba(168,22,40,.1)}
+.lbl{display:block;font-size:13px;font-weight:700;color:#5C3030;margin-bottom:5px}
+.fg{margin-bottom:14px}
+/* --- CARD --- */
+.card{background:#fff;border-radius:18px;box-shadow:var(--sh);border:1px solid rgba(168,22,40,.08)}
+/* --- BADGE --- */
+.bdg{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800}
+.bp2{background:#E8F5E9;color:#2E7D32}.bf{background:var(--rl);color:var(--r)}.br{background:#FFF8E1;color:#E65100}
+/* ===== LANDING ===== */
+#sl{background:linear-gradient(150deg,#fff 0%,var(--rp) 60%,var(--rl) 100%);align-items:center;justify-content:center;padding:20px}
+.lc{background:#fff;border-radius:22px;padding:36px 30px;max-width:420px;width:100%;box-shadow:0 16px 48px rgba(168,22,40,.15);text-align:center;animation:up .4s ease}
+@keyframes up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.logo{width:72px;height:72px;border-radius:16px;object-fit:contain;margin:0 auto 14px;display:block}
+.logo-fb{width:72px;height:72px;background:var(--r);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:900;color:#fff;margin:0 auto 14px}
+.ttag{font-size:11px;font-weight:800;letter-spacing:2px;color:var(--r);text-transform:uppercase;margin-bottom:3px}
+.ttl{font-size:22px;font-weight:900;color:#2D1515;margin-bottom:3px}
+.tsub{font-size:13px;color:#9E7070;margin-bottom:24px}
+.div{height:1px;background:linear-gradient(90deg,transparent,var(--rm),transparent);margin:18px 0}
+/* ===== TOPBAR ===== */
+.tb{background:#fff;border-bottom:2px solid var(--rl);padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:50;box-shadow:0 2px 10px rgba(168,22,40,.07)}
+.tb-brand{display:flex;align-items:center;gap:8px}
+.tb-logo{width:32px;height:32px;border-radius:8px;object-fit:contain}
+.tb-logo-fb{width:32px;height:32px;background:var(--r);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff}
+.tb-name{font-size:14px;font-weight:800;color:#2D1515}
+.tb-meta{font-size:11px;color:#9E7070}
+/* ===== PROGRESS ===== */
+.pt{height:4px;background:var(--rl)}.pf{height:4px;background:var(--r);transition:width .4s}
+/* ===== TEST ===== */
+.tbd{max-width:660px;margin:0 auto;padding:20px 14px;width:100%}
+/* Section header */
+.sh{background:linear-gradient(135deg,var(--r),#C62020);border-radius:14px;padding:18px 20px;margin-bottom:16px;position:relative;overflow:hidden}
+.sh::after{content:'';position:absolute;top:-20px;right:-20px;width:90px;height:90px;background:rgba(255,255,255,.07);border-radius:50%}
+.sh-t{font-size:17px;font-weight:900;color:#fff;position:relative}
+.sh-s{font-size:12px;color:rgba(255,255,255,.8);position:relative;margin-top:2px}
+.sh-b{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.2);color:#fff;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800}
+/* Video gate */
+.vg{background:#fff;border-radius:14px;padding:22px;border:2px solid var(--rl);margin-bottom:16px;animation:up .3s ease}
+.vg-top{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.vi{width:48px;height:48px;background:var(--r);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(168,22,40,.3)}
+.vg-t{font-size:16px;font-weight:900;color:#2D1515}
+.vg-s{font-size:12px;color:#9E7070;margin-top:2px}
+.vbtn{display:flex;align-items:center;gap:10px;padding:13px 18px;background:var(--rp);border:2px solid var(--rm);border-radius:12px;cursor:pointer;text-decoration:none;transition:.2s;margin-bottom:16px}
+.vbtn:hover{background:var(--rl);border-color:var(--r);transform:translateX(3px)}
+.vbi{width:38px;height:38px;background:var(--r);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.vbl{font-size:14px;font-weight:800;color:#2D1515}
+.vbs{font-size:11px;color:#9E7070;margin-top:1px}
+/* Timer */
+.tw{background:var(--rp);border:2px solid var(--rm);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px}
+.tr{width:60px;height:60px;position:relative;flex-shrink:0}
+.tr svg{width:60px;height:60px;transform:rotate(-90deg)}
+.tr-bg{fill:none;stroke:var(--rl);stroke-width:5}
+.tr-f{fill:none;stroke:var(--r);stroke-width:5;stroke-linecap:round;stroke-dasharray:157;transition:stroke-dashoffset 1s linear}
+.tr-txt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:var(--r)}
+.tu{background:#E8F5E9;border:2px solid #A5D6A7;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px}
+.tui{width:36px;height:36px;background:#388E3C;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+/* Questions */
+.qc{background:#fff;border-radius:12px;padding:18px;margin-bottom:12px;border:2px solid transparent;box-shadow:0 2px 8px rgba(168,22,40,.06);transition:.2s;animation:up .3s ease}
+.qc.ans{border-color:rgba(168,22,40,.2);background:linear-gradient(135deg,#fff,var(--rp))}
+.qc.flg{border-color:var(--r)!important;animation:shake .3s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.qt{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.qn{background:var(--rl);color:var(--r);font-size:10px;font-weight:800;padding:2px 9px;border-radius:20px}
+.qm{font-size:10px;font-weight:700;color:var(--r);display:none}
+.qc.flg .qm{display:block}
+.qq{font-size:14px;font-weight:700;color:#2D1515;margin-bottom:12px;line-height:1.5}
+.opts{display:grid;gap:7px}
+.ob{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#fff;border:2px solid var(--g2);border-radius:9px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:#5C3030;text-align:left;transition:.2s;width:100%}
+.ob:hover{border-color:var(--r);background:var(--rp)}
+.ob.sel{border-color:var(--r);background:var(--rp);font-weight:800;color:#2D1515}
+.od{width:20px;height:20px;border-radius:50%;border:2.5px solid var(--g2);flex-shrink:0;transition:.2s;display:flex;align-items:center;justify-content:center}
+.ob.sel .od{background:var(--r);border-color:var(--r)}
+.ob.sel .od::after{content:'';width:7px;height:7px;border-radius:50%;background:#fff}
+/* NAV */
+.tn{display:flex;gap:10px;margin-top:18px;padding-bottom:16px}
+.tn .btn{flex:1}
+/* Retake */
+.rb{background:linear-gradient(135deg,#FFF8E1,#fff);border:2px solid #FFE082;border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:13px;font-weight:700;color:#E65100;display:flex;align-items:center;gap:8px}
+/* ===== RESULT ===== */
+#sr{background:linear-gradient(150deg,#fff,var(--rp));padding:20px}
+.rc{background:#fff;border-radius:20px;padding:28px;max-width:580px;width:100%;margin:0 auto;box-shadow:var(--sh);animation:up .4s ease}
+.sc2{width:100px;height:100px;border-radius:50%;margin:0 auto 14px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:6px solid var(--rm)}
+.sc2.p{border-color:#81C784;background:#F1F8E9}.sc2.f{border-color:var(--r);background:var(--rp)}
+.spct{font-size:28px;font-weight:900}.sc2.p .spct{color:#2E7D32}.sc2.f .spct{color:var(--r)}
+.sl2{font-size:10px;font-weight:800;color:#9E7070;text-transform:uppercase;letter-spacing:.5px}
+.stb{display:inline-block;padding:7px 22px;border-radius:20px;font-size:14px;font-weight:800}
+.stb.p{background:#E8F5E9;color:#2E7D32}.stb.f{background:var(--rl);color:var(--r)}
+.srr{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--g1)}
+.srr:last-child{border-bottom:none}
+.srd{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.srn{flex:1;font-size:13px;font-weight:700}
+.mb{height:6px;border-radius:3px;background:var(--g1);width:80px;overflow:hidden;flex-shrink:0}
+.mf{height:6px;border-radius:3px}
+.rtr{background:var(--rp);border-radius:10px;padding:13px 16px;margin-top:14px;display:flex;justify-content:space-between;align-items:center}
+.rtk{background:linear-gradient(135deg,#FFF8E1,#fff);border:2px solid #FFE082;border-radius:12px;padding:14px 16px;margin-top:14px}
+/* ===== ADMIN LOGIN ===== */
+#sal{background:linear-gradient(150deg,#fff,var(--rp));align-items:center;justify-content:center;padding:20px}
+.alc{background:#fff;border-radius:20px;padding:36px 30px;max-width:360px;width:100%;box-shadow:var(--sh);text-align:center;animation:up .4s ease}
+/* ===== ADMIN ===== */
+#sad{background:var(--g1)}
+.atb{background:#fff;border-bottom:2px solid var(--rl);display:flex;align-items:stretch;box-shadow:0 2px 10px rgba(168,22,40,.07);position:sticky;top:0;z-index:50}
+.aba{padding:0 14px;display:flex;align-items:center;gap:8px;border-right:1px solid var(--rl)}
+.ats{display:flex;flex:1;overflow-x:auto}
+.at{padding:0 16px;font-size:13px;font-weight:700;color:#9E7070;cursor:pointer;border-bottom:3px solid transparent;display:flex;align-items:center;gap:5px;height:50px;white-space:nowrap;transition:.2s}
+.at:hover{color:#2D1515;background:var(--rp)}
+.at.act{color:var(--r);border-bottom-color:var(--r);font-weight:800}
+.alo{padding:0 14px;font-size:13px;font-weight:700;color:#9E7070;cursor:pointer;display:flex;align-items:center;margin-left:auto;border-left:1px solid var(--rl)}
+.alo:hover{color:var(--r)}
+.abd{max-width:940px;margin:0 auto;padding:18px 14px}
+/* Stats */
+.sgr{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:18px}
+.stt{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(168,22,40,.06);text-align:center}
+.sv{font-size:26px;font-weight:900;color:#2D1515}.sv.r{color:var(--r)}.sv.g{color:#388E3C}.sv.a{color:#FB8C00}
+.slb{font-size:11px;font-weight:700;color:#9E7070;text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
+/* Panel */
+.pan{background:#fff;border-radius:14px;box-shadow:0 2px 8px rgba(168,22,40,.06);margin-bottom:16px;overflow:hidden}
+.ph{padding:14px 18px;border-bottom:2px solid var(--rl);display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#fff,var(--rp))}
+.pt2{font-size:14px;font-weight:800;color:#2D1515}
+.pb{padding:18px}
+/* Table */
+.tw2{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:9px 11px;background:var(--rp);font-weight:800;color:#5C3030;border-bottom:2px solid var(--rl);white-space:nowrap}
+td{padding:9px 11px;border-bottom:1px solid var(--g1);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--rp)}
+.fr{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap}
+.fsi,.fii{padding:7px 11px;border:2px solid var(--g2);border-radius:8px;font-family:inherit;font-size:13px;font-weight:600;color:#2D1515;outline:none;background:#fff}
+.fsi:focus,.fii:focus{border-color:var(--r)}
+.fii{flex:1;min-width:140px}
+/* Accordion */
+.acc{border:2px solid var(--rl);border-radius:12px;margin-bottom:9px;overflow:hidden}
+.ach{padding:12px 16px;background:linear-gradient(135deg,var(--rp),#fff);display:flex;align-items:center;cursor:pointer;gap:8px;transition:.2s}
+.ach:hover{background:var(--rl)}
+.act2{font-size:14px;font-weight:800;color:#2D1515;flex:1}
+.acn{font-size:12px;background:var(--rl);color:var(--r);padding:2px 9px;border-radius:20px;font-weight:700}
+.acv{color:#9E7070;font-size:14px;transition:.3s}
+.acb{display:none;padding:14px 16px;border-top:2px solid var(--rl)}
+.acb.op{display:block}
+/* Q row */
+.qr{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--g1)}
+.qr:last-of-type{border-bottom:none}
+.qrn{width:24px;height:24px;background:var(--rl);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--r);flex-shrink:0;margin-top:1px}
+.qrt{flex:1;font-size:13px;font-weight:700;color:#2D1515;line-height:1.4}
+.qro{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+.oc{font-size:11px;padding:2px 7px;border-radius:6px;background:var(--g1);color:#9E7070;font-weight:600}
+.oc.ok{background:#E8F5E9;color:#2E7D32;font-weight:800}
+/* Add Q */
+.aqb{background:var(--rp);border:2px dashed var(--rm);border-radius:12px;padding:14px;margin-top:12px}
+.aqi{width:100%;padding:8px 12px;border:2px solid var(--rm);border-radius:8px;font-family:inherit;font-size:13px;background:#fff;color:#2D1515;outline:none;margin-bottom:7px}
+.aqi:focus{border-color:var(--r)}
+.og{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.oir{display:flex;align-items:center;gap:6px;background:#fff;border:2px solid var(--rm);border-radius:8px;padding:6px 10px}
+.oir input[type=radio]{accent-color:var(--r);width:15px;height:15px;flex-shrink:0}
+.oir input[type=text]{flex:1;border:none;outline:none;font-family:inherit;font-size:12px;font-weight:600;color:#2D1515;background:transparent}
+.oir.cs{border-color:var(--r);background:var(--rp)}
+/* Add section */
+.asb{background:linear-gradient(135deg,var(--rp),#fff);border:2px dashed var(--rm);border-radius:12px;padding:14px;margin-bottom:14px;display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap}
+/* Video row */
+.vr{display:flex;align-items:center;gap:8px;background:#fff;border:2px solid var(--rl);border-radius:8px;padding:9px 12px;margin-bottom:6px}
+.vri{padding:6px 10px;border:1.5px solid var(--g2);border-radius:7px;font-size:12px;font-family:inherit;outline:none}
+.vri:focus{border-color:var(--r)}
+/* Settings */
+.sg{border:2px solid var(--rl);border-radius:12px;padding:16px;margin-bottom:12px}
+.sgt{font-size:12px;font-weight:800;color:var(--r);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+/* Modal */
+.mo{position:fixed;inset:0;background:rgba(45,21,21,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:14px;backdrop-filter:blur(2px)}
+.mb2{background:#fff;border-radius:18px;padding:24px;max-width:640px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(168,22,40,.2);animation:up .3s ease}
+.mbs{max-width:360px;text-align:center}
+.mh{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:10px}
+.mt{font-size:16px;font-weight:900;color:#2D1515}
+.mm{font-size:12px;color:#9E7070;margin-top:2px}
+.mc{background:var(--g1);border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px;color:#9E7070;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mc:hover{background:var(--rl);color:var(--r)}
+/* Wrong Q */
+.wsh{font-size:13px;font-weight:800;padding:8px 0 5px;border-bottom:2px solid var(--rl);margin-bottom:8px}
+.wsh.p{color:#2E7D32}.wsh.f{color:var(--r)}
+.wqb{border:1.5px solid var(--rl);border-radius:9px;padding:11px;margin-bottom:9px;background:var(--rp)}
+.wqt{font-size:13px;font-weight:800;color:#2D1515;margin-bottom:8px}
+.or2{display:flex;align-items:center;gap:7px;padding:6px 9px;border-radius:7px;font-size:12px;margin-bottom:4px;font-weight:600}
+.or2.c{background:#E8F5E9;color:#2E7D32;border:1.5px solid #A5D6A7}
+.or2.w{background:var(--rl);color:var(--r);border:1.5px solid var(--rm)}
+.or2.n{background:var(--g1);color:#9E7070;border:1.5px solid var(--g2)}
+.ot{font-size:10px;padding:2px 6px;border-radius:5px;font-weight:800;margin-left:auto;flex-shrink:0}
+.tc{background:#C8E6C9;color:#2E7D32}.tw3{background:var(--rm);color:var(--r)}
+@media(max-width:500px){.lc,.alc,.rc{padding:22px 16px}.tbd,.abd{padding:12px 10px}.og{grid-template-columns:1fr}.at{padding:0 10px;font-size:11px}}
+</style>
+<link rel="manifest" id="pwa-manifest">
+<meta name="theme-color" content="#A81628">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Hosper Training">
+<link rel="apple-touch-icon" id="apple-icon">
+</head>
+<body>
+
+<!-- LANDING -->
+<div class="sc" id="sl">
+<div class="lc">
+  <img id="logo-l" class="logo hi" src="" alt="Hosper">
+  <div id="logo-lf" class="logo-fb">H</div>
+  <div class="ttag">Hosper Sales Training</div>
+  <div class="ttl">Training Test Portal</div>
+  <div class="tsub">Sales Officer Assessment System</div>
+  <div class="div"></div>
+  <div class="fg"><label class="lbl">Aapka Poora Naam *</label><input class="inp" id="iname" placeholder="Full name likhein"></div>
+  <div class="fg"><label class="lbl">Employee ID</label><input class="inp" id="iempid" placeholder="EMP-001 (optional)"></div>
+  <div class="fg"><label class="lbl">Mobile Number *</label><input class="inp" id="imob" type="tel" placeholder="10 digit mobile"></div>
+  <button class="btn bp bw" onclick="startTest(null)">▶ Test Shuru Karein</button>
+  <div style="margin-top:14px;font-size:13px;color:#9E7070">Admin? <a onclick="ss('sal')" style="color:var(--r);font-weight:800;cursor:pointer">Login karein →</a></div>
+</div>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div class="sc hi" id="sal">
+<div class="alc">
+  <img id="logo-al" class="logo hi" src="" alt="Hosper" style="width:60px;height:60px;margin-bottom:14px">
+  <div id="logo-alf" class="logo-fb" style="width:60px;height:60px;font-size:24px;margin-bottom:14px">H</div>
+  <div style="font-size:19px;font-weight:900;color:#2D1515;margin-bottom:3px">Admin Login</div>
+  <div style="font-size:13px;color:#9E7070;margin-bottom:20px">Trainer dashboard access</div>
+  <div class="fg" style="text-align:left"><label class="lbl">Password</label><input class="inp" id="iapwd" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')aLogin()"></div>
+  <button class="btn bp bw" onclick="aLogin()">Login Karein</button>
+  <div style="margin-top:12px;font-size:13px"><a onclick="ss('sl')" style="color:var(--r);font-weight:700;cursor:pointer">← Wapas</a></div>
+</div>
+</div>
+
+<!-- TEST -->
+<div class="sc hi" id="st">
+  <div class="tb">
+    <div class="tb-brand">
+      <img id="logo-t" class="tb-logo hi" src="" alt="">
+      <div id="logo-tf" class="tb-logo-fb">H</div>
+      <div><div class="tb-name">Hosper Training Test</div><div class="tb-meta" id="tb-meta"></div></div>
+    </div>
+    <div style="font-size:12px;color:#9E7070;font-weight:700" id="tb-right"></div>
+  </div>
+  <div class="pt"><div class="pf" id="pbar" style="width:0%"></div></div>
+  <div class="tbd">
+    <div id="rb-area"></div>
+    <div id="t-content"></div>
+    <div class="tn" id="t-nav"></div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="sc hi" id="sr">
+<div style="max-width:580px;margin:0 auto;padding:20px 14px;width:100%">
+<div class="rc">
+  <div style="text-align:center;margin-bottom:20px">
+    <div class="sc2" id="r-ring"><div class="spct" id="r-pct">-</div><div class="sl2">Score</div></div>
+    <div style="font-size:18px;font-weight:900;color:#2D1515" id="r-name"></div>
+    <div style="font-size:12px;color:#9E7070;margin-top:3px" id="r-meta"></div>
+    <div class="stb" id="r-status" style="margin-top:10px"></div>
+  </div>
+  <div style="font-size:14px;font-weight:800;color:#2D1515;margin-bottom:10px">Section-wise Result</div>
+  <div id="r-secs"></div>
+  <div class="rtr"><span style="font-size:13px;font-weight:700;color:#5C3030">Total Score</span><span style="font-size:17px;font-weight:900;color:#2D1515" id="r-total"></span></div>
+  <div id="r-retake"></div>
+  <button class="btn bo bw" style="margin-top:12px" onclick="ss('sl')">Home Jaein</button>
+</div>
+</div>
+</div>
+
+<!-- ADMIN -->
+<div class="sc hi" id="sad">
+  <div class="atb">
+    <div class="aba">
+      <img id="logo-ab" class="tb-logo hi" src="" alt="">
+      <div id="logo-abf" class="tb-logo-fb">H</div>
+      <span style="font-size:13px;font-weight:800;color:#2D1515;white-space:nowrap">Hosper Admin</span>
+    </div>
+    <div class="ats">
+      <div class="at act" id="tab-r" onclick="sTab('r')">📊 Results</div>
+      <div class="at" id="tab-q" onclick="sTab('q')">❓ Questions</div>
+      <div class="at" id="tab-s" onclick="sTab('s')">⚙️ Settings</div>
+    </div>
+    <div class="alo" onclick="ss('sl')">Logout →</div>
+  </div>
+  <div id="tb-r" class="abd">
+    <div class="sgr" id="a-stats"></div>
+    <div class="pan">
+      <div class="ph"><div class="pt2">Candidates Results</div><div style="display:flex;gap:6px"><button class="btn bo bsm" onclick="expCSV()">CSV</button><button class="btn bsm" style="color:var(--r);border:1.5px solid var(--rm)" onclick="clrAll()">Clear All</button></div></div>
+      <div class="pb">
+        <div class="fr">
+          <select class="fsi" id="f-st" onchange="rResults()"><option value="">All Status</option><option value="Pass">Pass</option><option value="Fail">Fail</option><option value="Retake">Retake</option></select>
+          <input class="fii" id="f-q" placeholder="Naam ya mobile..." oninput="rResults()">
+        </div>
+        <div class="tw2"><table><thead><tr><th>#</th><th>Naam</th><th>EMP</th><th>Mobile</th><th>Date</th><th>Score</th><th>%</th><th>Status</th><th>Action</th></tr></thead><tbody id="r-tbody"></tbody></table></div>
+      </div>
+    </div>
+  </div>
+  <div id="tb-q" class="abd hi">
+    <div class="pan">
+      <div class="ph"><div class="pt2">Sections & Questions Manage Karein</div></div>
+      <div class="pb">
+        <div class="asb">
+          <div style="flex:1;min-width:180px"><label class="lbl" style="margin-bottom:4px">Naya Section</label><input class="inp" id="ns-name" placeholder="Section ka naam..."></div>
+          <button class="btn bp" onclick="addSec()">+ Add Section</button>
+        </div>
+        <div id="sec-acc"></div>
+      </div>
+    </div>
+  </div>
+  <div id="tb-s" class="abd hi">
+    <div class="pan"><div class="ph"><div class="pt2">Settings</div></div>
+    <div class="pb" style="max-width:440px">
+      <div class="sg"><div class="sgt">Pass/Fail Criteria</div>
+        <div class="fg"><label class="lbl">Pass Percentage (%)</label><input class="inp" id="s-pct" type="number" min="1" max="100" value="80" style="max-width:180px"></div>
+      </div>
+      <div class="sg"><div class="sgt">Security</div>
+        <div class="fg"><label class="lbl">Admin Password Change</label><input class="inp" id="s-pwd" type="password" placeholder="Naya password (khali = same rehega)" style="max-width:280px"></div>
+      </div>
+      <div class="sg"><div class="sgt">Company Logo</div>
+        <div class="fg"><label class="lbl">Logo Upload (PNG/JPG)</label><input type="file" id="s-logo" accept="image/*" onchange="upLogo(this)" style="padding:9px;border:2px solid var(--rm);border-radius:8px;width:100%;font-size:13px;background:#fff;font-family:inherit"></div>
+        <div id="lp-area" class="hi" style="margin-bottom:10px;display:flex;align-items:center;gap:10px"><img id="lp-img" style="width:64px;height:64px;object-fit:contain;border-radius:10px;border:2px solid var(--rm)"><button class="btn bsm" style="color:var(--r);border:1.5px solid var(--rm)" onclick="rmLogo()">Logo Hatao</button></div>
+      </div>
+      <button class="btn bp" style="padding:11px 28px" onclick="saveSets()">Settings Save Karein ✓</button>
+    </div></div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="mo hi" id="m-detail" onclick="mBgClick(event,'m-detail')">
+  <div class="mb2"><div class="mh"><div><div class="mt" id="m-title"></div><div class="mm" id="m-meta"></div></div><button class="mc" onclick="document.getElementById('m-detail').classList.add('hi')">✕</button></div><div id="m-body"></div></div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="mo hi" id="m-conf">
+  <div class="mb2 mbs">
+    <div style="font-size:36px;margin-bottom:10px">⚠️</div>
+    <div style="font-size:15px;font-weight:900;color:#2D1515;margin-bottom:5px" id="c-title"></div>
+    <div style="font-size:13px;color:#9E7070;margin-bottom:18px" id="c-sub"></div>
+    <div style="display:flex;gap:8px;justify-content:center">
+      <button class="btn bsm" id="c-yes" style="color:var(--r);border:1.5px solid var(--rm);padding:8px 20px">Haan Delete</button>
+      <button class="btn bg bsm" onclick="document.getElementById('m-conf').classList.add('hi')" style="padding:8px 20px">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var MCQ=[{"section":"Basic Job MCQ","videoLink":"","videoDuration":0,"questions":[{"question":"DBP ki Full Form Kya Hai?","options":[{"text":"Dealer Billing Point","correct":false},{"text":"Direct Billing Point","correct":true},{"text":"Direct Billing Purchase","correct":false},{"text":"Dealer Billing Purchase","correct":false}]},{"question":"SO Full Form Kya Hai?","options":[{"text":"Sales Officer","correct":true},{"text":"Sales Opration","correct":false},{"text":"System Officer","correct":false},{"text":"None Of These","correct":false}]},{"question":"TSM Full Form Kya Hai?","options":[{"text":"Test Sales Manager","correct":false},{"text":"Territory Sales Manager","correct":true},{"text":"Territory Sales Men","correct":false},{"text":"None Of These","correct":false}]},{"question":"ASM Full Form Kya Hai?","options":[{"text":"Assistant Sales Manager","correct":false},{"text":"Auto Sales Manager","correct":false},{"text":"Area Sales manager","correct":true},{"text":"Assisgned Sales manager","correct":false}]},{"question":"BM Full Form Kya Hai?","options":[{"text":"Branch Manager","correct":true},{"text":"Basic Manager","correct":false},{"text":"Brand Manager","correct":false},{"text":"None Of These","correct":false}]},{"question":"Common Brand Ke Kya Nuksan Hai?","options":[{"text":"Low Margin","correct":false},{"text":"No Monopoly","correct":false},{"text":"Both A & B","correct":true},{"text":"None Of These","correct":false}]},{"question":"Day Ka Pehla Visit Kispe Karna Hai?","options":[{"text":"Direct Dealer","correct":false},{"text":"Head Office/SS","correct":false},{"text":"ASM","correct":false},{"text":"Distributor","correct":true}]},{"question":"Morning Me Sabse Pehle Kise Call Karna Hai?","options":[{"text":"ASM/Manager","correct":true},{"text":"Head Office","correct":false},{"text":"Distributor","correct":false},{"text":"National Sales Manager","correct":false}]},{"question":"SO Ki Working Kya Hai?","options":[{"text":"Secondary","correct":false},{"text":"Primary","correct":false},{"text":"Both A & B","correct":true},{"text":"All Of These","correct":false}]},{"question":"Order Kaha Punch Karna Hai?","options":[{"text":"Whatsapp Group","correct":false},{"text":"Mobile App","correct":true},{"text":"Website","correct":false},{"text":"NoteBook","correct":false}]},{"question":"Apne manager ko reporting kab kab karni hai?","options":[{"text":"Subah","correct":false},{"text":"Sham","correct":false},{"text":"Dono time","correct":true},{"text":"Afternoon","correct":false}]},{"question":"Sales karne ke liye sabse zyada zaroori kya hai?","options":[{"text":"Sample shining","correct":true},{"text":"More visit","correct":false},{"text":"Boss ko reporting karna","correct":false},{"text":"None of these","correct":false}]}]},{"section":"Catalog MCQ","videoLink":"","videoDuration":0,"questions":[{"question":"Hmare Switch kitne Lakh Click ke liye tested hain?","options":[{"text":"1 Lakh","correct":false},{"text":"1.5 Lakh","correct":false},{"text":"2 Lakh","correct":true},{"text":"5 Lakh","correct":false}]},{"question":"Modular Series ka kya naam hai?","options":[{"text":"Universal Series","correct":true},{"text":"Victory Series","correct":false},{"text":"PC Series","correct":false},{"text":"modular","correct":false}]},{"question":"Load Safe me kya hota hai?","options":[{"text":"Copper","correct":false},{"text":"Iron","correct":false},{"text":"Plastic","correct":false},{"text":"Chini-Mitti","correct":true}]},{"question":"Inme Se Kaunsa Item Hot Seller Hai?","options":[{"text":"16 A Combined + Box","correct":true},{"text":"16 A Combined","correct":false},{"text":"6 A Combined + Box","correct":false},{"text":"All Of These","correct":false}]}]},{"section":"Distributor Discount","videoLink":"","videoDuration":0,"questions":[{"question":"Net Item pe kitna discount milta hai?","options":[{"text":"50% Discount","correct":false},{"text":"60% Discount","correct":false},{"text":"Fix net rate","correct":true},{"text":"None of these","correct":false}]},{"question":"Dealer ko kitna discount hota hai?","options":[{"text":"0.5","correct":false},{"text":"0.6","correct":true},{"text":"0.66","correct":false},{"text":"0.7","correct":false}]},{"question":"Pre GST Amount Kaise nikle?","options":[{"text":"Total Cost-18%","correct":false},{"text":"Total Cost-1.18","correct":false},{"text":"Total Cost/1.18%","correct":false},{"text":"Total Cost/1.18","correct":true}]}]},{"section":"App MCQ","videoLink":"","videoDuration":0,"questions":[{"question":"Hmara App Play Store/App Store per Kis Name Se Hai?","options":[{"text":"Hosper","correct":false},{"text":"Hosper App","correct":false},{"text":"Hosper Connect","correct":true},{"text":"None Of These","correct":false}]},{"question":"1 Counter Se bina Checkout Kare Next Counter Per Checkin Kar Sakte Hai?","options":[{"text":"Ha","correct":false},{"text":"Nahi","correct":true},{"text":"Kabhi-Kabhi","correct":false},{"text":"None Of These","correct":false}]},{"question":"PJP Kab Submit Karna Hota Hai?","options":[{"text":"Till 2nd of every month","correct":true},{"text":"Mid Of Month","correct":false},{"text":"End Of Month","correct":false},{"text":"Any Day","correct":false}]},{"question":"Local Conveyance Expense Last Kitne Din Ka Fill Kar Sakte Ho?","options":[{"text":"2 Days","correct":true},{"text":"3 Days","correct":false},{"text":"5 Days","correct":false},{"text":"7 Days","correct":false}]},{"question":"Outstation Conveyance Last Kitne Din Ka Fill Kar Sakte Ho?","options":[{"text":"0 Days","correct":false},{"text":"1 Day","correct":true},{"text":"3 Days","correct":false},{"text":"5 Days","correct":false}]},{"question":"E-Catalog App Per Available hai?","options":[{"text":"Yes","correct":true},{"text":"No","correct":false}]},{"question":"App Per Last Kitne Month Ki Attendance Check Kar Sakte Ho?","options":[{"text":"1 Month","correct":false},{"text":"2 Month","correct":true},{"text":"3 Month","correct":false},{"text":"4 Month","correct":false}]},{"question":"App Related Issues Kise Batana Hota Hai?","options":[{"text":"Software Team Only","correct":false},{"text":"RM Only","correct":false},{"text":"Both A & B","correct":true},{"text":"Distributor","correct":false}]}]},{"section":"Company Introduction","videoLink":"","videoDuration":0,"questions":[{"question":"Hmari Company Ka Name Kya hai?","options":[{"text":"Bharat Industries","correct":false},{"text":"Bharat Electronic Industries","correct":false},{"text":"Bharat Electrical Industries","correct":true},{"text":"Hosper","correct":false}]},{"question":"Hmari Company me kitne Employees hai?","options":[{"text":"100+ Employees","correct":false},{"text":"500+ Employees","correct":true},{"text":"1000+ Employees","correct":false},{"text":"2000+ Employees","correct":false}]},{"question":"Hosper Product Ki Manufacturing Kaha Hoti Hai?","options":[{"text":"Delhi","correct":false},{"text":"Haryana","correct":false},{"text":"Mumbai","correct":false},{"text":"All Of These","correct":true}]},{"question":"Hosper Brand Kis Year Me Start Hua Tha?","options":[{"text":"1971","correct":false},{"text":"2012","correct":false},{"text":"2014","correct":true},{"text":"2019","correct":false}]},{"question":"Bharat Ke Electric Industries Me Kin Companies Ke Pas Patent Hai?","options":[{"text":"Hosper","correct":true},{"text":"Ancer","correct":false},{"text":"Havlles","correct":false},{"text":"All Of These","correct":false}]}]},{"section":"POP MCQ","videoLink":"","videoDuration":0,"questions":[{"question":"Material amount pe kitna % POP point milta hai?","options":[{"text":"0.03","correct":false},{"text":"0.01","correct":true},{"text":"0.015","correct":false},{"text":"0.1","correct":false}]},{"question":"Electrician T-Shirt kitne POP point me milti hai?","options":[{"text":"50","correct":false},{"text":"100","correct":true},{"text":"150","correct":false},{"text":"180","correct":false}]},{"question":"3 Lakh ka material lene per kitne POP Point hote hai?","options":[{"text":"1000 Point","correct":false},{"text":"2000 Point","correct":false},{"text":"3000 Point","correct":true},{"text":"None of These","correct":false}]},{"question":"Sample Board (4x2 feet) Kitne POP Point ka hai?","options":[{"text":"1000 Point","correct":false},{"text":"2500 Point","correct":false},{"text":"2000 Point","correct":true}]},{"question":"Kya point ke badle paise milenge?","options":[{"text":"100% amount milega","correct":false},{"text":"Nahi","correct":true}]}]},{"section":"SO Part 3 MCQ","videoLink":"","videoDuration":0,"questions":[{"question":"Daily minimum Secondary Value Kitni honi chahiye?","options":[{"text":"30 k","correct":false},{"text":"40 k","correct":true},{"text":"50 k","correct":false},{"text":"None of these","correct":false}]},{"question":"Month me kin-kin dates per audit hoti hai?","options":[{"text":"Weekly","correct":false},{"text":"10,15,20,25,30","correct":true},{"text":"2 times a month","correct":false},{"text":"None of these","correct":false}]}]},{"section":"SO Part 2 MCQ","videoLink":"","videoDuration":0,"questions":[{"question":"Dealer ka material kiske through aata hai?","options":[{"text":"Retailer ke through","correct":false},{"text":"Direct Dealer ke through","correct":false},{"text":"Distributor ke through","correct":true},{"text":"None of these","correct":false}]},{"question":"New Direct dealer open karne ke liye minimum kitne ka benchmark hota hai?","options":[{"text":"1 Lakh","correct":true},{"text":"2 Lakh","correct":false},{"text":"5 Lakh","correct":false},{"text":"10 Lakh","correct":false}]}]},{"section":"Modular MCQ","videoLink":"","videoDuration":0,"questions":[{"question":"Hmare Modular load safe Socket Kitne Ampere ke hote hai?","options":[{"text":"6 A","correct":false},{"text":"16 A","correct":true},{"text":"10 A","correct":false},{"text":"20 A","correct":false}]},{"question":"Hmare load safe Switch Kitne Ampere ke hote hai?","options":[{"text":"6 A","correct":false},{"text":"16 A","correct":false},{"text":"10 A","correct":false},{"text":"20 A","correct":true}]},{"question":"Hamari cute plate me kya khasiyat hai?","options":[{"text":"Super flexible","correct":false},{"text":"Steel guarded","correct":false},{"text":"Shining","correct":false},{"text":"All","correct":true}]},{"question":"Premium grey series ke load safe switch socket me kya hai?","options":[{"text":"Coupon","correct":false},{"text":"Socket super locking","correct":false},{"text":"Chini mitti","correct":false},{"text":"All","correct":true}]},{"question":"Hosper 6A modular sockets ki kya khasiyat hai?","options":[{"text":"Master Fitting","correct":false},{"text":"Super locking","correct":true},{"text":"Chini Mitti in All","correct":false},{"text":"ALL","correct":false}]},{"question":"Kis Hosper product me ek bhi replacement nahi hai?","options":[{"text":"Extension Cord","correct":false},{"text":"Light","correct":false},{"text":"MCB triping","correct":false},{"text":"Regulator nob","correct":true}]},{"question":"Hamari Konsi Universal color series haal me launch hui hai?","options":[{"text":"Ice grey","correct":false},{"text":"Matt black","correct":false},{"text":"Premium Grey","correct":true},{"text":"Teak wood","correct":false}]},{"question":"Chini Mitti kin switch socket me lagai jaati hai?","options":[{"text":"Load safe","correct":true},{"text":"6A switch","correct":false},{"text":"6A socket","correct":false},{"text":"B & C Both","correct":false}]}]},{"section":"Hook Item","videoLink":"","videoDuration":0,"questions":[{"question":"Inme se konsa product hot seller hai?","options":[{"text":"Combined with box","correct":true},{"text":"Regulator","correct":false},{"text":"Extension cord","correct":false},{"text":"Bells","correct":false}]},{"question":"Combined me konse metal part use kiye gaye hai?","options":[{"text":"Copper","correct":false},{"text":"Brass","correct":true},{"text":"Iron","correct":false},{"text":"Aluminium","correct":false}]},{"question":"Hosper ke 16A combined me 2 pin adaptor achhi fitting se kyun lagta hai?","options":[{"text":"Super locking","correct":false},{"text":"Brass part","correct":false},{"text":"Smart shutter","correct":true},{"text":"All","correct":false}]}]},{"section":"Coupon MCQ","videoLink":"","videoDuration":0,"questions":[{"question":"Coupon kis series ke product me hai?","options":[{"text":"Universal series","correct":false},{"text":"Non modular series","correct":false},{"text":"Wire","correct":false},{"text":"All","correct":true}]},{"question":"Kam se kam kitne point ka elec. coupon hai?","options":[{"text":"1 Point","correct":false},{"text":"3 Point","correct":false},{"text":"5 Point","correct":true},{"text":"10 Point","correct":false}]},{"question":"1-6 Module me kitne elec. point ka coupon hai?","options":[{"text":"5 point","correct":true},{"text":"10 point","correct":false},{"text":"20 point","correct":false},{"text":"15 point","correct":false}]},{"question":"Kis colour plate me koi bhi coupon nahi hai?","options":[{"text":"Premium Grey Plate","correct":false},{"text":"Teak wood Plate","correct":false},{"text":"Ice grey Plate","correct":false},{"text":"Red Rose Plate","correct":true}]},{"question":"Inme se Kiske liye coupon available hai?","options":[{"text":"Electrician","correct":false},{"text":"Dealer","correct":false},{"text":"Distributor","correct":false},{"text":"Both A & B","correct":true}]}]}];
+var LOGO_DATA='data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCABQAFADASIAAhEBAxEB/8QAGQABAQEBAQEAAAAAAAAAAAAAAAcEBgIB/8QANBAAAQMDAwIEAwUJAAAAAAAAAQACAwQFEQYSIRMxIkFRkQeBoRUjQlJxFBYkMjVhdLLB/8QAGQEBAAMBAQAAAAAAAAAAAAAAAAECAwQG/8QAJhEAAgEDAwMEAwAAAAAAAAAAAAERAgMSBCExUWFxExRBkYGx8P/aAAwDAQACEQMRAD8A5RERcR7oIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCLVao2TXeiikaHsfURtc09iC4AhUKu0nEPiHRNgsg+yekOrth+53Yf38s52/RWVLZzXdTTaqiro39EzRd5FpGguOsb11v4S1W0hz2w+H8IOB6DgkrPctPafuemaq9aafUM/YietDMSctHJPPI4OVODKrWW5S33jwp4k4tF3r9N6YsVioKq9x19RJWsDnTU+dkRIBxx27+ec4Kz6dsunJdMXC93WCpkhpalzB05CHBnhxwMZPiTBj3lGLqScTHnwcUioR0Lam6roKZkk0tur6aSZgL8PaWgHv6eILDcrTpRtxo7fQQ3BlQ+vZBL1twaWbsO2k+fblMGRTrLdTSSb2nj+6HFoqZXaI03VS3C2241NNcKGFshc95cw7hkZz5cc9lMs5GfUKHS0a2NRReTx+Ovc22b+uW/wDyov8AcKq19+uUHxJorPHOBRTRBz49g5O1574z5BR4HGCDgr0ZHl28yO3D8W4591NNUGd/Sq9VL6NffyVOhqIKjU+rLFJM2KavwIS44yentI+oOP1WCG2y6K0Jd2XWWEVNfmOKJj92fDt/6T+inRcS7cXEuznOefdfZJZJXbpZHyEcAvcXH6qczL2TmMttp26FZ0jQ6koaaGnuklHPZnU+77x2XxgjIbyOw7HOQsdorbfbtH6hq6ejirKGK4vMUD/5HsywDuDxzkfJTPry9LpdaTp/k3nb7dl5D3BpaHuDT3GeD8kzKvQ5NuqrlrhRx+ee5QtM6kqtS6/pZ6iNkMcNNKyKGPkNGBnnzPb2WnUFJqN19tNVdn0jqOK6MZTiHO8BzuM/JqmjXFhy1xafUHC+maR2MyvODkZeSme25d6NK4qqISiOPPfuWK8n7W/eGyW8imuQjjk3s4dUMLBwT7t/tkeqjZBaS0gtI4IIwQvXVfu39R+78245915Jzkk5JUVVZGum0/oJqZ4/R//Z';
+var ICO192='data:image/png;base64,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';
+var ICO48='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAABCGlDQ1BJQ0MgUHJvZmlsZQAAeJxjYGA8wQAELAYMDLl5JUVB7k4KEZFRCuwPGBiBEAwSk4sLGHADoKpv1yBqL+viUYcLcKakFicD6Q9ArFIEtBxopAiQLZIOYWuA2EkQtg2IXV5SUAJkB4DYRSFBzkB2CpCtkY7ETkJiJxcUgdT3ANk2uTmlyQh3M/Ck5oUGA2kOIJZhKGYIYnBncAL5H6IkfxEDg8VXBgbmCQixpJkMDNtbGRgkbiHEVBYwMPC3MDBsO48QQ4RJQWJRIliIBYiZ0tIYGD4tZ2DgjWRgEL7AwMAVDQsIHG5TALvNnSEfCNMZchhSgSKeDHkMyQx6QJYRgwGDIYMZAKbWPz9HbOBQAAAGJElEQVR42u2ZW2yUVRCAZ875r7vdbndrS9O7ggXFQgERFKwgeMGgoGhFjIBKFIyXGNTEG8YHNEYNPimaGExQSbyQiEYlakSQm1AspbRIoQUUaUsve9/9L+eMD/+WtohvPvCw5+mc+ec/8/0zc2b+5OCXZbUMEC6OIYAUhIsGBwABGFxkIweUA8oB5YByQDmgHFAOKAeUA8oB5YByQDmgHFAO6H8dyvAFMgaIICURZedEJOXgYwQAIBqxgScEAhq+HKmGCEAAmBVeUOcCQIhuIikcRzEMbhpuKi0si2sa95keq7RtkISaiogeJXIuHQeERIUDY0BErgApAZGpCnhqRIOGszQkBAgJDJmqAsDQBwMAAL83fxQCImMila5+eMmYVQ9KyxpoOli+aP7Y1Y8pAX/k9xamKG48rhWGlUCeG4tL2+aaBkRuPKHmB9RgQFg2OQ4qiuL3KaEgUxUnnpCOwzUNGEPOs45BBADFZyoFQVS4E42SkExTz7mKhjyEKG27ePbM8tvmpo6dOPn5F+Gr66obFoAQnRs2qQX5dWvXViyYp/h8fY1NzS+9HmtuBcSa1asuf3SZXlSYPtO9b+UzVk9v/ZaP1fwAAPQ3Hjy05o3IwZYZmz/yV5UjY0zTznz3U/u7G+q3bFSD+SBE797G5jVvJI8e56Z5zk/svJCREPZAxJFReyBCQoh0RqRT49c8M3rZYmk7saPHi66deu0n61HTQlfX1b68Gjk/veV7aTsileG6bhRfYg9EIi1tRTOumfrBW8ww/FUVeVUVyBhISUJwQzdLikUylfq7q2RO/dT1b6KqDo/aiKRmnCPnwdorKm+9M3/s5cg5CdcsLa1qWOAmU7/e/VD//qYbvt00ataM4lnXcb+PhDjzw7ad9z2sB0NMUUKTaoGob++BHXctn9++JzD6Un91hRtPkJTb5i3OdJ8FIUKTJwBR377fdy9/4vaje0K1VxqlJelTfzFd9wI34tgjZwBw6dKG2d99UXn37QBAQvoqSrlpJDpPJdo7GLKe7buBqGDC+OihNuS8evGd8xq3VTQsFKkMMAaIzNADNaO5aQKAdFzvQNRv2XjTrm/N8jKRsQCRXBGeMlEL5vfubRxOc76HiAgA+ptaoq1toYm1BePHkRDMy990GhhDTSXbAUStMDSwv+nAs6+OfXJFePKEaR+8jZzFDrUBQMmc+vlHdgFA18+/JjtOcEMHAL0wDIhMU5ExAAhPm3T9jTOTf57e98hqAATMHsHzPURCAsCpTzf/cv/iv7763kssq38AEH2lJQBgRXrNyjIgynT1IFfa33n/mzHTWtauIyHK5t/s7Wn19Z/+euuRdev3r3wWkQFnRLR1yk1flV4VbWnz+KzefieR5KZBkhAR6D8KIw3mna6Eua6REFzTksc7o38cC44dM+65xyPNrZX33AGIXVu3FU6fUnHvwp6fd/gqy5BzOxojxyEh+vY27li4TAvmc9NAXSXbJSGrlza4qVTiWKfVc5aEiB0+0vtb0+Q3X7ny+Sf3rXhaL76EXPEvDxEpfh9yzjRVujbTNeSc5/mkbTe/sNaOxMY99cj0D9/RQwVH39twdufu0jtuqVm1fOZnH172QIM1ED323kfcNJFzNRTUCoJaYQgVBQiUgJ8p/KqXnq577cWaJ1YI20HOfeVlnRs2pc50Vy9ZVDJvjhuLe6EEANzsXS0gStsJT63zVZZFD7VFW4+EJtYGxo1JHD8RPdgqHcc/uqp49kxumpHmw73bdzNNM0YVha+ZbJaWOLF4zy+7ku0dZkVZUf309N/dfXv2MzVb7opmzVADedKxkbH06a54e8eoufXW2b7uH7eHpkwM1FyW6DgZOdDs5bUAGgQCAESRSkvb4abODUOk0yJjM13jpoGIImOJVJqAmKqqAT8RSNsW6QxJiYjcNLlpSNt2EymmKtzvO3dq3ESShPTSlmkK03U3nkSFq4E8N5WWlsV0nZuGpz8SaLC5ZhsQQ0Q21FwRvaIAcpiEMc9S9hVPMrwfZ0vJUDclKZHz7MQzRxJklv5fly9ey8zOCUAMLYlgMO+GJOLCkhG3OWJE70SAIZ3h5gafKi7QxfNPJID+AZVlAO3nxuwPAAAAAElFTkSuQmCC';
+var D={mcq:[],res:[],cfg:{pp:80,pwd:'hosper2024',logo:LOGO_DATA},cand:{},ans:{},cur:0,rSecs:null,tmr:null,tSec:0};
+function load(){try{var m=localStorage.getItem('hm');D.mcq=m?JSON.parse(m):JSON.parse(JSON.stringify(MCQ));var r=localStorage.getItem('hr');D.res=r?JSON.parse(r):[];var c=localStorage.getItem('hc');if(c)D.cfg=Object.assign(D.cfg,JSON.parse(c));}catch(e){D.mcq=JSON.parse(JSON.stringify(MCQ));}applyLogo();}
+function save(){localStorage.setItem('hm',JSON.stringify(D.mcq));localStorage.setItem('hr',JSON.stringify(D.res));localStorage.setItem('hc',JSON.stringify(D.cfg));}
+function applyLogo(){var lg=D.cfg.logo;if(lg){['l','al','t','ab'].forEach(function(x){var el=document.getElementById('logo-'+x);var fb=document.getElementById('logo-'+x+'f');if(el){el.src=lg;el.classList.remove('hi');}if(fb)fb.classList.add('hi');});var lp=document.getElementById('lp-img');if(lp){lp.src=lg;document.getElementById('lp-area').classList.remove('hi');}}}
+function rmLogo(){D.cfg.logo=null;document.getElementById('s-logo').value='';document.getElementById('lp-area').classList.add('hi');['l','al','t','ab'].forEach(function(x){var el=document.getElementById('logo-'+x);var fb=document.getElementById('logo-'+x+'f');if(el)el.classList.add('hi');if(fb)fb.classList.remove('hi');});}
+function upLogo(inp){var f=inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(e){D.cfg.logo=e.target.result;applyLogo();};r.readAsDataURL(f);}
+function ss(id){document.querySelectorAll('.sc').forEach(function(s){s.classList.add('hi');});document.getElementById(id).classList.remove('hi');}
+function aLogin(){if(document.getElementById('iapwd').value===D.cfg.pwd){document.getElementById('iapwd').value='';ss('sad');sTab('r');}else alert('Galat password!');}
+function mBgClick(e,id){if(e.target.id===id)document.getElementById(id).classList.add('hi');}
+function getAS(){return D.rSecs?D.rSecs.map(function(i){return D.mcq[i];}):D.mcq;}
+function startTest(rSecs){var nm=document.getElementById('iname').value.trim();var mb=document.getElementById('imob').value.trim();if(!nm){alert('Naam zaroori hai!');return;}if(!mb||mb.replace(/\D/g,'').length<10){alert('Sahi 10 digit mobile daalein!');return;}D.cand={name:nm,empId:document.getElementById('iempid').value.trim()||'-',mobile:mb,date:new Date().toLocaleDateString('en-IN')};D.rSecs=rSecs||null;D.ans={};var secs=getAS();for(var i=0;i<secs.length;i++)D.ans[i]={};D.cur=0;ss('st');rTest();}
+function rTest(){clearInterval(D.tmr);D.tSec=0;var secs=getAS();document.getElementById('pbar').style.width=Math.round(D.cur/secs.length*100)+'%';document.getElementById('tb-meta').textContent=D.cand.name;document.getElementById('tb-right').textContent='Section '+(D.cur+1)+'/'+secs.length;document.getElementById('rb-area').innerHTML=D.rSecs?'<div class="rb">⚡ Retake Mode — Sirf failed sections</div>':'';var sec=secs[D.cur];var hasV=sec.videoLink&&sec.videoLink.trim()!=='';var dur=(parseInt(sec.videoDuration)||0)*60;var h='<div class="sh"><div class="sh-t">'+sec.section+'</div><div class="sh-s">'+sec.questions.length+' questions • Saare zaroori hain</div><div class="sh-b">Section '+(D.cur+1)+'/'+secs.length+'</div></div>';if(hasV){h+='<div class="vg" id="vg"><div class="vg-top"><div class="vi"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M5 3l14 9-14 9z"/></svg></div><div><div class="vg-t">Pehle Training Video Dekhein</div><div class="vg-s">Video dekhne ke baad test unlock hoga</div></div></div><a href="'+sec.videoLink+'" target="_blank" class="vbtn" onclick="vOpened()"><div class="vbi"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M5 3l14 9-14 9z"/></svg></div><div><div class="vbl">Training Video Kholein</div><div class="vbs">Nayi tab mein khulega</div></div><span style="margin-left:auto;font-size:18px;color:var(--r)">→</span></a><div id="t-area"><div style="font-size:13px;color:#9E7070;text-align:center;padding:10px">⬆ Pehle video link pe click karein</div></div></div>';}h+='<div id="qa"'+(hasV?' style="display:none"':'')+'>'+sec.questions.map(function(q,qi){var a=D.ans[D.cur][qi];return'<div class="qc'+(a!==undefined?' ans':'')+'" id="qc-'+qi+'"><div class="qt"><span class="qn">Q'+(qi+1)+'</span><span class="qm">★ Zaroori</span></div><div class="qq">'+q.question+'</div><div class="opts">'+q.options.map(function(o,oi){return'<button class="ob'+(a===oi?' sel':'')+'" onclick="pickA('+qi+','+oi+',this)"><div class="od"></div>'+o.text+'</button>';}).join('')+'</div></div>';}).join('')+'</div>';document.getElementById('t-content').innerHTML=h;var nav='';if(D.cur>0)nav+='<button class="btn bg" onclick="prevS()">← Pichla</button>';else nav+='<div></div>';if(D.cur<secs.length-1)nav+='<button class="btn bp" id="bn" onclick="nextS()">Agla Section →</button>';else nav+='<button class="btn bs" id="bn" onclick="submitT()">✓ Submit Karein</button>';document.getElementById('t-nav').innerHTML=nav;window.scrollTo(0,0);}
+function vOpened(){var sec=getAS()[D.cur];var dur=(parseInt(sec.videoDuration)||0)*60;if(dur>0){startTmr(dur);}else{document.getElementById('t-area').innerHTML='<div class="tu"><div class="tui"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><polyline points="20 6 9 17 4 12"/></svg></div><div style="font-size:13px;font-weight:800;color:#2E7D32">Video link khul gaya! Ab test karein.</div></div>';unlockQ();}}
+function startTmr(tot){D.tSec=tot;rTmr(tot,tot);D.tmr=setInterval(function(){D.tSec--;if(D.tSec<=0){clearInterval(D.tmr);document.getElementById('t-area').innerHTML='<div class="tu"><div class="tui"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><polyline points="20 6 9 17 4 12"/></svg></div><div style="font-size:13px;font-weight:800;color:#2E7D32">Timer khatam! Test unlock ✓</div></div>';unlockQ();}else rTmr(D.tSec,tot);},1000);}
+function rTmr(rem,tot){var m=Math.floor(rem/60),s=rem%60,str=m+':'+(s<10?'0':'')+s,off=157-(157*(rem/tot));var ta=document.getElementById('t-area');if(!ta)return;ta.innerHTML='<div class="tw"><div class="tr"><svg viewBox="0 0 50 50"><circle class="tr-bg" cx="25" cy="25" r="25"/><circle class="tr-f" cx="25" cy="25" r="25" style="stroke-dashoffset:'+off+'"/></svg><div class="tr-txt">'+str+'</div></div><div><div style="font-size:11px;font-weight:700;color:#9E7070;text-transform:uppercase;letter-spacing:.5px">Timer</div><div style="font-size:13px;font-weight:700;color:#2D1515">Video dekhte rehein...</div><div style="font-size:11px;color:#9E7070;margin-top:2px">Test '+str+' baad unlock hoga</div></div></div>';}
+function unlockQ(){var qa=document.getElementById('qa');if(qa){qa.style.display='';qa.style.animation='up .5s ease';}}
+function pickA(qi,oi,el){D.ans[D.cur][qi]=oi;var c=document.getElementById('qc-'+qi);c.classList.add('ans');c.classList.remove('flg');c.querySelectorAll('.ob').forEach(function(b){b.classList.remove('sel');});el.classList.add('sel');}
+function chkAll(){var sec=getAS()[D.cur];var ok=true;sec.questions.forEach(function(q,qi){if(D.ans[D.cur][qi]===undefined){ok=false;var c=document.getElementById('qc-'+qi);c.classList.add('flg');setTimeout(function(){c.classList.remove('flg');},600);}});if(!ok)alert('Saare questions ka jawab zaroori hai!');return ok;}
+function prevS(){clearInterval(D.tmr);D.cur--;rTest();}
+function nextS(){if(!chkAll())return;clearInterval(D.tmr);D.cur++;rTest();}
+function submitT(){if(!chkAll())return;clearInterval(D.tmr);var secs=getAS();var tQ=0,tC=0,ss2=[];secs.forEach(function(sec,si){var c=0,wq=[];sec.questions.forEach(function(q,qi){var a=D.ans[si][qi];var ok=a!==undefined&&q.options[a]&&q.options[a].correct;if(ok)c++;else wq.push({question:q.question,chosenText:(a!==undefined&&q.options[a])?q.options[a].text:'—',correctText:q.options.filter(function(o){return o.correct;})[0].text,allOptions:q.options});});tQ+=sec.questions.length;tC+=c;ss2.push({section:sec.section,correct:c,total:sec.questions.length,pct:Math.round(c/sec.questions.length*100),wrongQ:wq});});var fSecs,oPct;if(D.rSecs){var prev=null;for(var i=D.res.length-1;i>=0;i--){if(D.res[i].mobile===D.cand.mobile&&!D.res[i].isR){prev=D.res[i];break;}}fSecs=prev?prev.secs.slice():[];D.rSecs.forEach(function(oi,si){fSecs[oi]=ss2[si];});tC=fSecs.reduce(function(s,x){return s+x.correct;},0);tQ=fSecs.reduce(function(s,x){return s+x.total;},0);oPct=Math.round(tC/tQ*100);}else{fSecs=ss2;oPct=Math.round(tC/tQ*100);}var rec={id:Date.now(),name:D.cand.name,empId:D.cand.empId,mobile:D.cand.mobile,date:D.cand.date,total:tC,max:tQ,pct:oPct,status:oPct>=D.cfg.pp?'Pass':'Fail',isR:!!D.rSecs,secs:fSecs};D.res.push(rec);save();showRes(rec);}
+function showRes(rec){var p=rec.status==='Pass';document.getElementById('r-ring').className='sc2 '+(p?'p':'f');document.getElementById('r-pct').className='spct '+(p?'p':'f');document.getElementById('r-pct').textContent=rec.pct+'%';document.getElementById('r-name').textContent=rec.name;document.getElementById('r-meta').textContent='EMP: '+rec.empId+' | '+rec.date+(rec.isR?' | Retake':'');var st=document.getElementById('r-status');st.className='stb '+(p?'p':'f');st.textContent=p?'✓ PASS — Congratulations!':'✗ FAIL — Dobara koshish karo';document.getElementById('r-total').textContent=rec.total+'/'+rec.max+' ('+rec.pct+'%)';var fi=[],h='';rec.secs.forEach(function(s,i){var sp=s.pct>=D.cfg.pp;if(!sp)fi.push(i);var col=sp?'#388E3C':'var(--r)';h+='<div class="srr"><div class="srd" style="background:'+col+'"></div><div class="srn">'+s.section+'</div><div style="font-size:11px;color:#9E7070">'+s.correct+'/'+s.total+'</div><div class="mb"><div class="mf" style="width:'+s.pct+'%;background:'+col+'"></div></div><div style="font-size:11px;font-weight:800;color:'+col+';width:32px;text-align:right">'+s.pct+'%</div></div>';});document.getElementById('r-secs').innerHTML=h;var rh='';if(!p&&fi.length){rh='<div class="rtk"><div style="font-size:13px;font-weight:800;color:#E65100;margin-bottom:6px">⚡ Failed Sections — Retake Available</div>'+fi.map(function(i){return'<div style="font-size:12px;color:#BF360C;font-weight:600">• '+rec.secs[i].section+' ('+rec.secs[i].pct+'%)</div>';}).join('')+'<button class="btn bp" style="margin-top:10px;font-size:13px;padding:9px 18px" onclick="doRetake('+JSON.stringify(fi)+')">Sirf Failed Sections Ka Retake →</button></div>';}document.getElementById('r-retake').innerHTML=rh;ss('sr');}
+function doRetake(idxs){D.rSecs=idxs;D.ans={};var secs=getAS();for(var i=0;i<secs.length;i++)D.ans[i]={};D.cur=0;ss('st');rTest();}
+function sTab(t){['r','q','s'].forEach(function(x){document.getElementById('tb-'+x).classList.add('hi');document.getElementById('tab-'+x).classList.remove('act');});document.getElementById('tb-'+t).classList.remove('hi');document.getElementById('tab-'+t).classList.add('act');if(t==='r')rResults();if(t==='q')rQTab();if(t==='s'){document.getElementById('s-pct').value=D.cfg.pp;if(D.cfg.logo){document.getElementById('lp-img').src=D.cfg.logo;document.getElementById('lp-area').classList.remove('hi');}}}
+function rResults(){var q=(document.getElementById('f-q').value||'').toLowerCase();var st=document.getElementById('f-st').value;var t=D.res.length;var p=D.res.filter(function(r){return r.status==='Pass'&&!r.isR;}).length;var f=D.res.filter(function(r){return r.status==='Fail'&&!r.isR;}).length;var rt=D.res.filter(function(r){return r.isR;}).length;var avg=t?Math.round(D.res.reduce(function(s,r){return s+r.pct;},0)/t):0;document.getElementById('a-stats').innerHTML='<div class="stt"><div class="sv">'+t+'</div><div class="slb">Total</div></div><div class="stt"><div class="sv g">'+p+'</div><div class="slb">Passed</div></div><div class="stt"><div class="sv r">'+f+'</div><div class="slb">Failed</div></div><div class="stt"><div class="sv a">'+rt+'</div><div class="slb">Retakes</div></div><div class="stt"><div class="sv">'+avg+'%</div><div class="slb">Avg Score</div></div>';var flt=D.res.filter(function(r){return(!q||(r.name.toLowerCase().includes(q)||r.mobile.includes(q)))&&(!st||(st==='Retake'?r.isR:r.status===st));}).slice().reverse();if(!flt.length){document.getElementById('r-tbody').innerHTML='<tr><td colspan="9" style="text-align:center;color:#9E7070;padding:24px">Koi result nahi</td></tr>';return;}document.getElementById('r-tbody').innerHTML=flt.map(function(r,i){var sb=r.isR?'<span class="bdg br">Retake</span>':'<span class="bdg '+(r.status==='Pass'?'bp2':'bf')+'">'+r.status+'</span>';return'<tr><td>'+(i+1)+'</td><td><b>'+r.name+'</b></td><td>'+r.empId+'</td><td>'+r.mobile+'</td><td>'+r.date+'</td><td>'+r.total+'/'+r.max+'</td><td><b>'+r.pct+'%</b></td><td>'+sb+'</td><td style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn bo bsm" onclick="openD('+r.id+')">Detail</button><button class="btn bsm" style="color:var(--r);border:1.5px solid var(--rm)" onclick="delR('+r.id+')">Del</button></td></tr>';}).join('');}
+function openD(id){var r=D.res.find(function(x){return x.id===id;});if(!r)return;document.getElementById('m-title').textContent=r.name+' — '+r.pct+'% ('+(r.isR?'Retake':r.status)+')';document.getElementById('m-meta').textContent='EMP: '+r.empId+' | '+r.mobile+' | '+r.date+' | '+r.total+'/'+r.max;var wc=0,h='';(r.secs||[]).forEach(function(s){var sp=s.pct>=D.cfg.pp;h+='<div class="wsh '+(sp?'p':'f')+'">'+(sp?'✓':'✗')+' '+s.section+' — '+s.correct+'/'+s.total+' ('+s.pct+'%)</div>';if(!s.wrongQ||s.wrongQ.length===0){h+='<div style="font-size:12px;color:#388E3C;font-weight:700;padding:6px 0">✓ Saare questions sahi!</div>';}else{wc+=s.wrongQ.length;s.wrongQ.forEach(function(wq){h+='<div class="wqb"><div class="wqt">✗ '+wq.question+'</div>';wq.allOptions.forEach(function(o){var ch=o.text===wq.chosenText,cr=o.correct;var cls=cr?'c':ch?'w':'n';h+='<div class="or2 '+cls+'">'+(cr?'✓ ':ch?'✗ ':'  ')+o.text;if(cr)h+='<span class="ot tc">Sahi</span>';if(ch&&!cr)h+='<span class="ot tw3">Aapne chuna</span>';h+='</div>';});h+='</div>';});} });if(wc>0)h='<div style="background:var(--rl);border-radius:7px;padding:7px 12px;margin-bottom:12px;font-size:12px;color:var(--r);font-weight:800">✗ '+wc+' galat jawab</div>'+h;document.getElementById('m-body').innerHTML=h;document.getElementById('m-detail').classList.remove('hi');}
+function delR(id){conf('Is result delete karein?','Undo nahi hoga.',function(){D.res=D.res.filter(function(r){return r.id!==id;});save();rResults();});}
+function clrAll(){conf('Saare results delete karein?','Saara data permanently delete hoga!',function(){D.res=[];save();rResults();});}
+function rQTab(){var h='';D.mcq.forEach(function(sec,si){h+='<div class="acc"><div class="ach" onclick="tAcc('+si+')"><div class="act2">'+sec.section+'</div><span class="acn">'+sec.questions.length+'</span><button class="btn bsm" style="color:var(--r);border:1.5px solid var(--rm)" onclick="event.stopPropagation();delSec('+si+')">Del</button><span class="acv" id="av-'+si+'">▼</span></div><div class="acb" id="ab-'+si+'"><div style="margin-bottom:12px;padding:10px 12px;background:var(--rp);border-radius:9px;border:2px solid var(--rl)"><div style="font-size:11px;font-weight:800;color:var(--r);margin-bottom:7px">🎬 Video Settings</div><div class="vr"><div style="flex:1"><div style="font-size:11px;font-weight:700;color:#9E7070;margin-bottom:3px">Video Link</div><input class="vri" id="vl-'+si+'" value="'+(sec.videoLink||'')+'" placeholder="Drive/YouTube link" style="width:100%"></div><div><div style="font-size:11px;font-weight:700;color:#9E7070;margin-bottom:3px">Min</div><input class="vri" id="vd-'+si+'" type="number" min="0" value="'+(sec.videoDuration||0)+'" style="width:60px;text-align:center"></div><button class="btn bp bsm" onclick="saveVL('+si+')">Save</button></div>'+(sec.videoLink?'<div style="font-size:11px;color:#388E3C;font-weight:700;margin-top:3px">✓ Video set — '+sec.videoDuration+' min</div>':'')+'</div>'+sec.questions.map(function(q,qi){return'<div class="qr"><div class="qrn">'+(qi+1)+'</div><div style="flex:1"><div class="qrt">'+q.question+'</div><div class="qro">'+q.options.map(function(o){return'<span class="oc'+(o.correct?' ok':'')+'">'+o.text+(o.correct?' ✓':'')+'</span>';}).join('')+'</div></div><button class="btn bsm" style="color:var(--r);border:1.5px solid var(--rm)" onclick="delQ('+si+','+qi+')">Del</button></div>';}).join('')+'<div class="aqb"><div style="font-size:12px;font-weight:800;color:var(--r);margin-bottom:9px">+ Naya Question</div><input class="aqi" id="nq-'+si+'" placeholder="Question likhein..."><div style="font-size:11px;font-weight:700;color:#5C3030;margin-bottom:5px">Options — Sahi ke aage ● dabayein</div><div class="og">'+[0,1,2,3].map(function(oi){return'<div class="oir" id="oir-'+si+'-'+oi+'"><input type="radio" name="nr-'+si+'" value="'+oi+'" onchange="hlOpt('+si+','+oi+')"><input type="text" id="no-'+si+'-'+oi+'" placeholder="Option '+(oi+1)+'"></div>';}).join('')+'</div><button class="btn bs bsm" style="font-size:13px;padding:8px 14px" onclick="addQ('+si+')">Add Question ✓</button></div></div></div>';});document.getElementById('sec-acc').innerHTML=h;}
+function tAcc(si){var b=document.getElementById('ab-'+si);var a=document.getElementById('av-'+si);b.classList.toggle('op');a.textContent=b.classList.contains('op')?'▲':'▼';}
+function hlOpt(si,oi){[0,1,2,3].forEach(function(i){var r=document.getElementById('oir-'+si+'-'+i);if(r)r.className='oir'+(i===oi?' cs':'');});}
+function saveVL(si){D.mcq[si].videoLink=document.getElementById('vl-'+si).value.trim();D.mcq[si].videoDuration=parseInt(document.getElementById('vd-'+si).value)||0;save();rQTab();setTimeout(function(){var ab=document.getElementById('ab-'+si);if(ab&&!ab.classList.contains('op')){ab.classList.add('op');document.getElementById('av-'+si).textContent='▲';}},50);}
+function addSec(){var n=document.getElementById('ns-name').value.trim();if(!n){alert('Section naam daalein!');return;}D.mcq.push({section:n,videoLink:'',videoDuration:0,questions:[]});save();document.getElementById('ns-name').value='';rQTab();}
+function delSec(si){conf('"'+D.mcq[si].section+'" delete karein?',D.mcq[si].questions.length+' questions bhi delete honge.',function(){D.mcq.splice(si,1);save();rQTab();});}
+function addQ(si){var txt=document.getElementById('nq-'+si).value.trim();if(!txt){alert('Question likhein!');return;}var opts=[],ci=-1;document.querySelectorAll('input[name="nr-'+si+'"]').forEach(function(r,i){if(r.checked)ci=i;});for(var i=0;i<4;i++){var v=document.getElementById('no-'+si+'-'+i).value.trim();if(!v){alert('Saare 4 options bharein!');return;}opts.push({text:v,correct:i===ci});}if(ci===-1){alert('Sahi answer ke radio pe click karein!');return;}D.mcq[si].questions.push({question:txt,options:opts});save();rQTab();setTimeout(function(){var ab=document.getElementById('ab-'+si);if(ab&&!ab.classList.contains('op')){ab.classList.add('op');document.getElementById('av-'+si).textContent='▲';}},50);}
+function delQ(si,qi){conf('Question delete karein?','"'+D.mcq[si].questions[qi].question.substring(0,50)+'..."',function(){D.mcq[si].questions.splice(qi,1);save();rQTab();});}
+function saveSets(){var p=parseFloat(document.getElementById('s-pct').value);if(p<1||p>100){alert('1-100 ke beech daalein');return;}D.cfg.pp=p;var np=document.getElementById('s-pwd').value.trim();if(np)D.cfg.pwd=np;save();applyLogo();document.getElementById('s-pwd').value='';alert('Settings save! ✓');}
+function conf(title,sub,cb){document.getElementById('c-title').textContent=title;document.getElementById('c-sub').textContent=sub;document.getElementById('m-conf').classList.remove('hi');document.getElementById('c-yes').onclick=function(){document.getElementById('m-conf').classList.add('hi');cb();};}
+function expCSV(){if(!D.res.length){alert('Koi data nahi!');return;}var rows=[['Name','EMP','Mobile','Date','Score','Max','Pct','Status','Type']];D.res.forEach(function(r){rows.push(['"'+r.name+'"',r.empId,r.mobile,r.date,r.total,r.max,r.pct+'%',r.status,r.isR?'Retake':'First']);});var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(rows.map(function(r){return r.join(',');}).join('\n'));a.download='hosper_results.csv';a.click();}
+load();
+</script>
+
+<script>
+// PWA Manifest injection
+(function(){
+  var ico192 = typeof ICO192!=='undefined'?ICO192:'';
+  var manifest = {
+    name:"Hosper Sales Training",
+    short_name:"Hosper Test",
+    description:"Sales Officer Training & Assessment",
+    start_url:"./",
+    display:"standalone",
+    background_color:"#FFF5F5",
+    theme_color:"#A81628",
+    orientation:"portrait-primary",
+    icons:[
+      {src:"data:image/png;base64,"+ico192,sizes:"192x192",type:"image/png",purpose:"any maskable"},
+      {src:"data:image/png;base64,"+ico192,sizes:"512x512",type:"image/png",purpose:"any maskable"}
+    ]
+  };
+  var blob = new Blob([JSON.stringify(manifest)],{type:'application/json'});
+  var url = URL.createObjectURL(blob);
+  document.getElementById('pwa-manifest').href = url;
+  // Apple touch icon
+  var ai = document.getElementById('apple-icon');
+  if(ai) ai.href = "data:image/png;base64,"+ico192;
+})();
+
+// Service Worker for offline
+if('serviceWorker' in navigator){
+  var sw = `
+self.addEventListener('install',function(e){self.skipWaiting();});
+self.addEventListener('activate',function(e){e.waitUntil(clients.claim());});
+self.addEventListener('fetch',function(e){
+  e.respondWith(
+    caches.open('hosper-v1').then(function(cache){
+      return cache.match(e.request).then(function(cached){
+        var net=fetch(e.request).then(function(r){cache.put(e.request,r.clone());return r;}).catch(function(){return cached;});
+        return cached||net;
+      });
+    })
+  );
+});`;
+  var swBlob = new Blob([sw],{type:'text/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(function(){});
+}
+
+// Install prompt
+var deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',function(e){
+  e.preventDefault();
+  deferredPrompt=e;
+  showInstallBanner();
+});
+
+function showInstallBanner(){
+  if(document.getElementById('install-banner')) return;
+  var b=document.createElement('div');
+  b.id='install-banner';
+  b.style.cssText='position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#A81628;color:#fff;padding:12px 20px;border-radius:14px;font-family:Nunito,Arial,sans-serif;font-size:13px;font-weight:700;z-index:9999;display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(168,22,40,.4);max-width:360px;width:90%';
+  b.innerHTML='<span style="font-size:20px">&#128242;</span><span style="flex:1">App install karein — offline bhi chalega!</span><button onclick="installApp()" style="background:#fff;color:#A81628;border:none;padding:6px 14px;border-radius:8px;font-weight:800;cursor:pointer;font-size:13px">Install</button><button onclick="document.getElementById(String.fromCharCode(105,110,115,116,97,108,108,45,98,97,110,110,101,114)).remove()" style="background:transparent;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:18px;padding:0">&#x2715;</button>';
+  document.body.appendChild(b);
+}
+
+function installApp(){
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function(){
+      deferredPrompt=null;
+      var b=document.getElementById('install-banner');
+      if(b)b.remove();
+    });
+  }
+}
+
+// iOS detection - show manual install hint
+var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+var isInStandalone=window.navigator.standalone;
+if(isIOS&&!isInStandalone){
+  setTimeout(function(){
+    if(document.getElementById('install-banner')) return;
+    var b=document.createElement('div');
+    b.id='install-banner';
+    b.style.cssText='position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#A81628;color:#fff;padding:12px 18px;border-radius:14px;font-family:Nunito,Arial,sans-serif;font-size:13px;font-weight:700;z-index:9999;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(168,22,40,.4);max-width:360px;width:90%';
+    b.innerHTML='<span style="font-size:18px">📱</span><span style="flex:1">iPhone pe install: <b>Share</b> → <b>Add to Home Screen</b></span><button onclick="this.parentElement.remove()" style="background:transparent;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:18px">✕</button>';
+    document.body.appendChild(b);
+  },3000);
+}
+</script>
+
+</body>
+</html>
