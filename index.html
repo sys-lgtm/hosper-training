@@ -439,49 +439,106 @@ var D={mcq:[],res:[],cfg:{pp:80,pwd:'hosper2024',logo:LOGO_DATA},cand:{},ans:{},
 
 // ===== BREAK SYSTEM =====
 var breakTimer=null;
+
+// Save all test state to sessionStorage
+function saveTestState(){
+  try{
+    var state={
+      cand:D.cand, ans:D.ans, cur:D.cur, rSecs:D.rSecs,
+      mcqElapsed:D.mcqElapsed + (D.mcqStart?Date.now()-D.mcqStart:0),
+      breakTotal:D.breakTotal,
+      onBreak:D.onBreak,
+      breakStart:D.onBreak?D.breakStart:0
+    };
+    sessionStorage.setItem('testState', JSON.stringify(state));
+    sessionStorage.setItem('curPage','st');
+  }catch(e){}
+}
+
+// Restore test state from sessionStorage
+function restoreTestState(){
+  try{
+    var raw=sessionStorage.getItem('testState');
+    if(!raw)return false;
+    var state=JSON.parse(raw);
+    if(!state.cand||!state.cand.name)return false;
+    D.cand=state.cand;
+    D.ans=state.ans||{};
+    D.cur=state.cur||0;
+    D.rSecs=state.rSecs||null;
+    D.mcqElapsed=state.mcqElapsed||0;
+    D.mcqStart=Date.now(); // resume timer
+    D.breakTotal=state.breakTotal||0;
+    D.onBreak=false;
+    return true;
+  }catch(e){return false;}
+}
+
 function takeBreak(){
   if(D.onBreak)return;
   D.onBreak=true;
   D.breakStart=Date.now();
   // Pause MCQ timer
   if(D.mcqStart){D.mcqElapsed+=Date.now()-D.mcqStart;D.mcqStart=0;}
-  // Show break overlay
+  // Save state so if app closes during break, total break is preserved
+  saveTestState();
+  
   var overlay=document.createElement('div');
   overlay.id='break-overlay';
   overlay.style.cssText='position:fixed;inset:0;background:linear-gradient(135deg,#1a1a2e,#16213e);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:Nunito,Arial,sans-serif';
-  overlay.innerHTML='<div style="font-size:48px;margin-bottom:16px">☕</div>'+
-    '<div style="font-size:24px;font-weight:900;margin-bottom:8px">Break Time</div>'+
-    '<div style="font-size:14px;opacity:.8;margin-bottom:30px">Test hold hai — wapas aayein aur continue karein</div>'+
-    '<div style="font-size:48px;font-weight:900;color:#FFD700;font-family:monospace" id="break-count">00:00</div>'+
-    '<div style="font-size:12px;opacity:.6;margin-top:8px;margin-bottom:30px">Break duration</div>'+
-    '<button onclick="endBreak()" style="background:#A81628;color:#fff;border:none;padding:14px 32px;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:Nunito,Arial,sans-serif">▶ Test Continue Karein</button>';
+  
+  // Show cumulative break time
+  var prevBreak=D.breakTotal;
+  var curBreakSec=0;
+  
+  overlay.innerHTML=
+    '<div style="font-size:52px;margin-bottom:16px">☕</div>'+
+    '<div style="font-size:24px;font-weight:900;margin-bottom:6px">Break Time</div>'+
+    '<div style="font-size:13px;opacity:.7;margin-bottom:24px">Test hold hai — wapas aayein aur continue karein</div>'+
+    '<div style="background:rgba(255,255,255,.1);border-radius:16px;padding:20px 32px;text-align:center;margin-bottom:20px">'+
+      '<div style="font-size:12px;opacity:.6;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Is Break Ka Time</div>'+
+      '<div style="font-size:48px;font-weight:900;color:#FFD700;font-family:monospace" id="break-cur">00:00</div>'+
+    '</div>'+
+    '<div style="background:rgba(255,100,0,.2);border-radius:12px;padding:10px 24px;margin-bottom:24px;text-align:center">'+
+      '<div style="font-size:11px;opacity:.7;margin-bottom:2px">Aaj tak ka total break</div>'+
+      '<div style="font-size:22px;font-weight:900;color:#FF9500;font-family:monospace" id="break-total">'+fmtSecs(prevBreak)+'</div>'+
+    '</div>'+
+    '<button onclick="endBreak()" style="background:#A81628;color:#fff;border:none;padding:14px 36px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;font-family:Nunito,Arial,sans-serif;box-shadow:0 4px 16px rgba(168,22,40,.5)">▶ Test Continue Karein</button>';
+  
   document.body.appendChild(overlay);
-  var breakSec=0;
+  
   breakTimer=setInterval(function(){
-    breakSec++;
-    D.breakTotal+=1;
-    var m=Math.floor(breakSec/60),s=breakSec%60;
-    var el=document.getElementById('break-count');
+    curBreakSec++;
+    D.breakTotal=prevBreak+curBreakSec;
+    // Update current break display
+    var m=Math.floor(curBreakSec/60),s=curBreakSec%60;
+    var el=document.getElementById('break-cur');
     if(el)el.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+    // Update total break display
+    var tel=document.getElementById('break-total');
+    if(tel)tel.textContent=fmtSecs(D.breakTotal);
+    // Save state every 30 seconds during break
+    if(curBreakSec%30===0)saveTestState();
   },1000);
 }
 
 function endBreak(){
   D.onBreak=false;
   clearInterval(breakTimer);
-  // Resume MCQ timer
-  D.mcqStart=Date.now();
+  D.mcqStart=Date.now(); // Resume MCQ timer
   var overlay=document.getElementById('break-overlay');
   if(overlay)overlay.remove();
+  saveTestState(); // Save after break ends
 }
 
 function getMCQDuration(){
   var elapsed=D.mcqElapsed;
   if(D.mcqStart)elapsed+=Date.now()-D.mcqStart;
-  return Math.floor(elapsed/1000); // seconds
+  return Math.floor(elapsed/1000);
 }
 
 function fmtSecs(s){
+  s=Math.floor(s||0);
   var h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;
   if(h>0)return h+'h '+m+'m '+sec+'s';
   if(m>0)return m+'m '+sec+'s';
@@ -636,6 +693,20 @@ function clearCodes(){
 
 
 function load(){
+  // Try restore active test session first
+  if(restoreTestState()){
+    applyLogo();
+    // Load MCQ from Firebase then show restored test
+    FB_MCQ.on('value',function(s){
+      var m=s.val();
+      if(m&&Array.isArray(m)&&m.length>0)D.mcq=m;
+      else{D.mcq=JSON.parse(JSON.stringify(MCQ));FB_MCQ.set(D.mcq);}
+    });
+    FB_RES.on('value',function(s){var r=s.val();D.res=r?(Array.isArray(r)?r:Object.values(r)):[];});
+    try{var c=localStorage.getItem('hc');if(c)Object.assign(D.cfg,JSON.parse(c));}catch(e){}
+    setTimeout(function(){ss('st');rTest();},800);
+    return;
+  }
   // Load settings/password from localStorage (stays on admin device)
   try{var c=localStorage.getItem('hc');if(c)Object.assign(D.cfg,JSON.parse(c));}catch(e){}
   applyLogo();
@@ -789,11 +860,11 @@ function unlockQ(){
   // Start MCQ timer if not already running
   if(!D.mcqStart) D.mcqStart=Date.now();
 }
-function pickA(qi,oi,el){D.ans[D.cur][qi]=oi;var c=document.getElementById('qc-'+qi);c.classList.add('ans');c.classList.remove('flg');c.querySelectorAll('.ob').forEach(function(b){b.classList.remove('sel');});el.classList.add('sel');}
+function pickA(qi,oi,el){D.ans[D.cur][qi]=oi;var c=document.getElementById('qc-'+qi);c.classList.add('ans');c.classList.remove('flg');c.querySelectorAll('.ob').forEach(function(b){b.classList.remove('sel');});el.classList.add('sel');saveTestState();}
 function chkAll(){var sec=getAS()[D.cur];var ok=true;sec.questions.forEach(function(q,qi){if(D.ans[D.cur][qi]===undefined){ok=false;var c=document.getElementById('qc-'+qi);c.classList.add('flg');setTimeout(function(){c.classList.remove('flg');},600);}});if(!ok)alert('Saare questions ka jawab zaroori hai!');return ok;}
-function prevS(){clearInterval(D.tmr);D.cur--;rTest();}
-function nextS(){if(!chkAll())return;clearInterval(D.tmr);D.cur++;rTest();}
-function submitT(){if(!chkAll())return;clearInterval(D.tmr);D.testDuration=getMCQDuration();var secs=getAS();var tQ=0,tC=0,ss2=[];secs.forEach(function(sec,si){var c=0,wq=[];sec.questions.forEach(function(q,qi){var a=D.ans[si][qi];var ok=a!==undefined&&q.options[a]&&q.options[a].correct;if(ok)c++;else wq.push({question:q.question,chosenText:(a!==undefined&&q.options[a])?q.options[a].text:'—',correctText:q.options.filter(function(o){return o.correct;})[0].text,allOptions:q.options});});tQ+=sec.questions.length;tC+=c;ss2.push({section:sec.section,correct:c,total:sec.questions.length,pct:Math.round(c/sec.questions.length*100),wrongQ:wq});});var fSecs,oPct;if(D.rSecs){var prev=null;for(var i=D.res.length-1;i>=0;i--){if(D.res[i].mobile===D.cand.mobile&&!D.res[i].isR){prev=D.res[i];break;}}fSecs=prev?prev.secs.slice():[];D.rSecs.forEach(function(oi,si){fSecs[oi]=ss2[si];});tC=fSecs.reduce(function(s,x){return s+x.correct;},0);tQ=fSecs.reduce(function(s,x){return s+x.total;},0);oPct=Math.round(tC/tQ*100);}else{fSecs=ss2;oPct=Math.round(tC/tQ*100);}var rec={id:Date.now(),name:D.cand.name,empId:D.cand.empId,mobile:D.cand.mobile,email:D.cand.email,designation:D.cand.designation,state:D.cand.state,date:D.cand.date,testDuration:D.testDuration||0,breakTotal:D.breakTotal||0,total:tC,max:tQ,pct:oPct,status:oPct>=D.cfg.pp?'Pass':'Fail',isR:!!D.rSecs,secs:fSecs};D.res.push(rec);save();
+function prevS(){clearInterval(D.tmr);D.cur--;saveTestState();rTest();}
+function nextS(){if(!chkAll())return;clearInterval(D.tmr);D.cur++;saveTestState();rTest();}
+function submitT(){if(!chkAll())return;clearInterval(D.tmr);D.testDuration=getMCQDuration();var secs=getAS();var tQ=0,tC=0,ss2=[];secs.forEach(function(sec,si){var c=0,wq=[];sec.questions.forEach(function(q,qi){var a=D.ans[si][qi];var ok=a!==undefined&&q.options[a]&&q.options[a].correct;if(ok)c++;else wq.push({question:q.question,chosenText:(a!==undefined&&q.options[a])?q.options[a].text:'—',correctText:q.options.filter(function(o){return o.correct;})[0].text,allOptions:q.options});});tQ+=sec.questions.length;tC+=c;ss2.push({section:sec.section,correct:c,total:sec.questions.length,pct:Math.round(c/sec.questions.length*100),wrongQ:wq});});var fSecs,oPct;if(D.rSecs){var prev=null;for(var i=D.res.length-1;i>=0;i--){if(D.res[i].mobile===D.cand.mobile&&!D.res[i].isR){prev=D.res[i];break;}}fSecs=prev?prev.secs.slice():[];D.rSecs.forEach(function(oi,si){fSecs[oi]=ss2[si];});tC=fSecs.reduce(function(s,x){return s+x.correct;},0);tQ=fSecs.reduce(function(s,x){return s+x.total;},0);oPct=Math.round(tC/tQ*100);}else{fSecs=ss2;oPct=Math.round(tC/tQ*100);}var rec={id:Date.now(),name:D.cand.name,empId:D.cand.empId,mobile:D.cand.mobile,email:D.cand.email,designation:D.cand.designation,state:D.cand.state,date:D.cand.date,testDuration:D.testDuration||0,breakTotal:D.breakTotal||0,total:tC,max:tQ,pct:oPct,status:oPct>=D.cfg.pp?'Pass':'Fail',isR:!!D.rSecs,secs:fSecs};D.res.push(rec);save();try{sessionStorage.removeItem('testState');}catch(e){}
   // Save submission record to prevent re-test
   var failIdxs=rec.secs.map(function(s,i){return s.pct<D.cfg.pp?i:-1;}).filter(function(i){return i>=0;});
   var mobKey=rec.mobile.replace(/\D/g,'');
