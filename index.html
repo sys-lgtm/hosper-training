@@ -434,7 +434,59 @@ var FB_CFG=db.ref('config');
 var FB_CODES=db.ref('login_codes');
 var FB_SUBMITTED=db.ref('submitted');
 function showSync(msg,col){var el=document.getElementById('sync-ind');if(el){el.textContent=msg;el.style.background=col||'#388E3C';el.style.display='block';setTimeout(function(){el.style.display='none';},2500);}}
-var D={mcq:[],res:[],cfg:{pp:80,pwd:'hosper2024',logo:LOGO_DATA},cand:{},ans:{},cur:0,rSecs:null,tmr:null,tSec:0};
+var D={mcq:[],res:[],cfg:{pp:80,pwd:'hosper2024',logo:LOGO_DATA},cand:{},ans:{},cur:0,rSecs:null,tmr:null,tSec:0,mcqStart:0,mcqElapsed:0,breakStart:0,breakTotal:0,testDuration:0,onBreak:false};
+
+
+// ===== BREAK SYSTEM =====
+var breakTimer=null;
+function takeBreak(){
+  if(D.onBreak)return;
+  D.onBreak=true;
+  D.breakStart=Date.now();
+  // Pause MCQ timer
+  if(D.mcqStart){D.mcqElapsed+=Date.now()-D.mcqStart;D.mcqStart=0;}
+  // Show break overlay
+  var overlay=document.createElement('div');
+  overlay.id='break-overlay';
+  overlay.style.cssText='position:fixed;inset:0;background:linear-gradient(135deg,#1a1a2e,#16213e);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:Nunito,Arial,sans-serif';
+  overlay.innerHTML='<div style="font-size:48px;margin-bottom:16px">☕</div>'+
+    '<div style="font-size:24px;font-weight:900;margin-bottom:8px">Break Time</div>'+
+    '<div style="font-size:14px;opacity:.8;margin-bottom:30px">Test hold hai — wapas aayein aur continue karein</div>'+
+    '<div style="font-size:48px;font-weight:900;color:#FFD700;font-family:monospace" id="break-count">00:00</div>'+
+    '<div style="font-size:12px;opacity:.6;margin-top:8px;margin-bottom:30px">Break duration</div>'+
+    '<button onclick="endBreak()" style="background:#A81628;color:#fff;border:none;padding:14px 32px;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:Nunito,Arial,sans-serif">▶ Test Continue Karein</button>';
+  document.body.appendChild(overlay);
+  var breakSec=0;
+  breakTimer=setInterval(function(){
+    breakSec++;
+    D.breakTotal+=1;
+    var m=Math.floor(breakSec/60),s=breakSec%60;
+    var el=document.getElementById('break-count');
+    if(el)el.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+  },1000);
+}
+
+function endBreak(){
+  D.onBreak=false;
+  clearInterval(breakTimer);
+  // Resume MCQ timer
+  D.mcqStart=Date.now();
+  var overlay=document.getElementById('break-overlay');
+  if(overlay)overlay.remove();
+}
+
+function getMCQDuration(){
+  var elapsed=D.mcqElapsed;
+  if(D.mcqStart)elapsed+=Date.now()-D.mcqStart;
+  return Math.floor(elapsed/1000); // seconds
+}
+
+function fmtSecs(s){
+  var h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;
+  if(h>0)return h+'h '+m+'m '+sec+'s';
+  if(m>0)return m+'m '+sec+'s';
+  return sec+'s';
+}
 
 // ===== WATERMARK =====
 function addWatermark(){
@@ -467,36 +519,70 @@ function showPrint(id){
   if(!rec)return;
   var isPass=rec.status==='Pass';
   var logoSrc='data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCABQAFADASIAAhEBAxEB/8QAGQABAQEBAQEAAAAAAAAAAAAAAAcEBgIB/8QANBAAAQMDAwIEAwUJAAAAAAAAAQACAwQFEQYSIRMxIkFRkQeBoRUjQlJxFBYkMjVhdLLB/8QAGQEBAAMBAQAAAAAAAAAAAAAAAAECAwQG/8QAJhEAAgEDAwMEAwAAAAAAAAAAAAERAgMSBCExUWFxExRBkYGx8P/aAAwDAQACEQMRAD8A5RERcR7oIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCLVao2TXeiikaHsfURtc09iC4AhUKu0nEPiHRNgsg+yekOrth+53Yf38s52/RWVLZzXdTTaqiro39EzRd5FpGguOsb11v4S1W0hz2w+H8IOB6DgkrPctPafuemaq9aafUM/YietDMSctHJPPI4OVODKrWW5S33jwp4k4tF3r9N6YsVioKq9x19RJWsDnTU+dkRIBxx27+ec4Kz6dsunJdMXC93WCpkhpalzB05CHBnhxwMZPiTBj3lGLqScTHnwcUioR0Lam6roKZkk0tur6aSZgL8PaWgHv6eILDcrTpRtxo7fQQ3BlQ+vZBL1twaWbsO2k+fblMGRTrLdTSSb2nj+6HFoqZXaI03VS3C2241NNcKGFshc95cw7hkZz5cc9lMs5GfUKHS0a2NRReTx+Ovc22b+uW/wDyov8AcKq19+uUHxJorPHOBRTRBz49g5O1574z5BR4HGCDgr0ZHl28yO3D8W4591NNUGd/Sq9VL6NffyVOhqIKjU+rLFJM2KavwIS44yentI+oOP1WCG2y6K0Jd2XWWEVNfmOKJj92fDt/6T+inRcS7cXEuznOefdfZJZJXbpZHyEcAvcXH6qczL2TmMttp26FZ0jQ6koaaGnuklHPZnU+77x2XxgjIbyOw7HOQsdorbfbtH6hq6ejirKGK4vMUD/5HsywDuDxzkfJTPry9LpdaTp/k3nb7dl5D3BpaHuDT3GeD8kzKvQ5NuqrlrhRx+ee5QtM6kqtS6/pZ6iNkMcNNKyKGPkNGBnnzPb2WnUFJqN19tNVdn0jqOK6MZTiHO8BzuM/JqmjXFhy1xafUHC+maR2MyvODkZeSme25d6NK4qqISiOPPfuWK8n7W/eGyW8imuQjjk3s4dUMLBwT7t/tkeqjZBaS0gtI4IIwQvXVfu39R+78245915Jzkk5JUVVZGum0/oJqZ4/R//Z';
-  var html2='<div class="print-header">';
-  html2+='<img class="print-logo" src="'+logoSrc+'" alt="Hosper">';
-  html2+='<div><div class="print-title">Hosper Sales Training</div><div class="print-sub">Training Test Result Certificate</div></div>';
-  html2+='</div>';
-  html2+='<div class="print-info-grid">';
-  html2+='<div class="print-info-box"><div class="print-info-label">Candidate Name</div><div class="print-info-val">'+rec.name+'</div></div>';
-  html2+='<div class="print-info-box"><div class="print-info-label">Employee ID</div><div class="print-info-val">'+rec.empId+'</div></div>';
-  html2+='<div class="print-info-box"><div class="print-info-label">Mobile</div><div class="print-info-val">'+rec.mobile+'</div></div>';
-  html2+='<div class="print-info-box"><div class="print-info-label">Email</div><div class="print-info-val">'+(rec.email||'-')+'</div></div>';
-  html2+='<div class="print-info-box"><div class="print-info-label">Designation</div><div class="print-info-val">'+(rec.designation||'-')+'</div></div>';
-  html2+='<div class="print-info-box"><div class="print-info-label">State</div><div class="print-info-val">'+(rec.state||'-')+'</div></div>';
-  html2+='<div class="print-info-box"><div class="print-info-label">Test Date</div><div class="print-info-val">'+rec.date+'</div></div>';
-  html2+='<div class="print-info-box"><div class="print-info-label">Result Type</div><div class="print-info-val">'+(rec.isR?'Retake':'First Attempt')+'</div></div>';
-  html2+='</div>';
-  html2+='<div class="print-score-row '+(isPass?'pass':'fail')+'">';
-  html2+='<div><div style="font-size:13px;font-weight:700;color:'+(isPass?'#2E7D32':'#A81628')+'">Overall Result</div><div style="font-size:24px;font-weight:900;color:'+(isPass?'#2E7D32':'#A81628')+'">'+(isPass?'✓ PASS':'✗ FAIL')+'</div></div>';
-  html2+='<div style="text-align:right"><div style="font-size:32px;font-weight:900;color:'+(isPass?'#2E7D32':'#A81628')+'">'+rec.pct+'%</div><div style="font-size:13px;color:#666">'+rec.total+'/'+rec.max+' marks</div></div>';
-  html2+='</div>';
-  html2+='<table class="print-sec-table"><thead><tr><th>#</th><th>Section</th><th>Score</th><th>Percentage</th><th>Status</th></tr></thead><tbody>';
-  rec.secs.forEach(function(s,i){
-    var sp=s.pct>=(D.cfg.pp||80);
-    html2+='<tr><td>'+(i+1)+'</td><td>'+s.section+'</td><td>'+s.correct+'/'+s.total+'</td><td>'+s.pct+'%</td><td style="font-weight:800;color:'+(sp?'#2E7D32':'#A81628')+'">'+(sp?'Pass':'Fail')+'</td></tr>';
+  // Get retake info from Firebase
+  var mobKey=rec.mobile.replace(/\D/g,'');
+  FB_SUBMITTED.child(mobKey).once('value').then(function(sub){
+    var subData=sub.val()||{};
+    var retakeCount=subData.retakeCount||0;
+    var secRetakes=subData.secRetakes||{};
+    var breakMins=Math.floor((subData.testDuration?0:0)/60);
+    var durSecs=rec.testDuration||subData.testDuration||0;
+    var breakSecs=rec.breakTotal||0;
+    
+    var h='<div class="print-header">';
+    h+='<img class="print-logo" src="'+logoSrc+'" alt="Hosper">';
+    h+='<div><div class="print-title">Hosper Bharat Electrical Industries</div>';
+    h+='<div class="print-sub">Sales Training Test — Result Certificate</div></div>';
+    h+='</div>';
+    
+    h+='<div class="print-info-grid">';
+    h+='<div class="print-info-box"><div class="print-info-label">Candidate Name</div><div class="print-info-val">'+rec.name+'</div></div>';
+    h+='<div class="print-info-box"><div class="print-info-label">Employee ID</div><div class="print-info-val">'+rec.empId+'</div></div>';
+    h+='<div class="print-info-box"><div class="print-info-label">Mobile</div><div class="print-info-val">'+rec.mobile+'</div></div>';
+    h+='<div class="print-info-box"><div class="print-info-label">Email</div><div class="print-info-val">'+(rec.email||'-')+'</div></div>';
+    h+='<div class="print-info-box"><div class="print-info-label">Designation</div><div class="print-info-val">'+(rec.designation||'-')+'</div></div>';
+    h+='<div class="print-info-box"><div class="print-info-label">State</div><div class="print-info-val">'+(rec.state||'-')+'</div></div>';
+    h+='<div class="print-info-box"><div class="print-info-label">Test Date</div><div class="print-info-val">'+rec.date+'</div></div>';
+    h+='<div class="print-info-box"><div class="print-info-label">Total Retakes</div><div class="print-info-val">'+retakeCount+(retakeCount===0?' (First Attempt)':' times')+'</div></div>';
+    if(durSecs>0){h+='<div class="print-info-box"><div class="print-info-label">MCQ Duration</div><div class="print-info-val">'+fmtSecs(durSecs)+'</div></div>';}
+    if(breakSecs>0){h+='<div class="print-info-box"><div class="print-info-label">Break Taken</div><div class="print-info-val">'+fmtSecs(breakSecs)+'</div></div>';}
+    h+='</div>';
+    
+    h+='<div class="print-score-row '+(isPass?'pass':'fail')+'">';
+    h+='<div><div style="font-size:13px;font-weight:700;color:'+(isPass?'#2E7D32':'#A81628')+'">Overall Result</div>';
+    h+='<div style="font-size:28px;font-weight:900;color:'+(isPass?'#2E7D32':'#A81628')+'">'+(isPass?'✓ PASS':'✗ FAIL')+'</div></div>';
+    h+='<div style="text-align:right"><div style="font-size:36px;font-weight:900;color:'+(isPass?'#2E7D32':'#A81628')+'">'+rec.pct+'%</div>';
+    h+='<div style="font-size:13px;color:#666">'+rec.total+'/'+rec.max+' marks</div></div>';
+    h+='</div>';
+    
+    h+='<table class="print-sec-table"><thead><tr>';
+    h+='<th>#</th><th>Section</th><th>Score</th><th>%</th><th>Status</th><th>Retakes</th>';
+    h+='</tr></thead><tbody>';
+    rec.secs.forEach(function(s,i){
+      var sp=s.pct>=(D.cfg.pp||80);
+      var sRet=secRetakes[s.section]||0;
+      h+='<tr><td>'+(i+1)+'</td><td>'+s.section+'</td><td>'+s.correct+'/'+s.total+'</td>';
+      h+='<td>'+s.pct+'%</td>';
+      h+='<td style="font-weight:800;color:'+(sp?'#2E7D32':'#A81628')+'">'+(sp?'✓ Pass':'✗ Fail')+'</td>';
+      h+='<td style="font-weight:700;color:'+(sRet>0?'#E65100':'#666')+'">'+( sRet>0?sRet+' retake':'—')+'</td>';
+      h+='</tr>';
+    });
+    h+='</tbody></table>';
+    
+    // 3 Signature boxes
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:24px">';
+    h+='<div style="border-top:2px solid #2D1515;padding-top:8px;text-align:center"><div style="height:50px"></div><div style="font-size:12px;font-weight:800;color:#2D1515">Admin Signature</div><div style="font-size:11px;color:#9E7070;margin-top:2px">Name & Date</div></div>';
+    h+='<div style="border-top:2px solid #2D1515;padding-top:8px;text-align:center"><div style="height:50px"></div><div style="font-size:12px;font-weight:800;color:#2D1515">Sales Person Signature</div><div style="font-size:11px;color:#9E7070;margin-top:2px">'+rec.name+'</div></div>';
+    h+='<div style="border-top:2px solid #2D1515;padding-top:8px;text-align:center"><div style="height:50px"></div><div style="font-size:12px;font-weight:800;color:#2D1515">HR Signature</div><div style="font-size:11px;color:#9E7070;margin-top:2px">Name & Date</div></div>';
+    h+='</div>';
+    
+    h+='<div class="print-footer">Generated: '+new Date().toLocaleString('en-IN')+' | Hosper Bharat Electrical Industries | Confidential Document</div>';
+    
+    document.getElementById('print-area').innerHTML=h;
+    ss('spr');
   });
-  html2+='</tbody></table>';
-  html2+='<div class="print-footer">Generated on '+new Date().toLocaleString('en-IN')+' | Hosper Bharat Electrical Industries | Confidential</div>';
-  document.getElementById('print-area').innerHTML=html2;
-  ss('spr');
 }
 
-// ===== ADMIN - LOGIN CODE MANAGEMENT =====
 function genCode(){
   var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   var code='';
@@ -576,7 +662,24 @@ function save(){
 function applyLogo(){if(!D.cfg)return;var lg=D.cfg.logo;if(lg){['l','al','t','ab'].forEach(function(x){var el=document.getElementById('logo-'+x);var fb=document.getElementById('logo-'+x+'f');if(el){el.src=lg;el.classList.remove('hi');}if(fb)fb.classList.add('hi');});var lp=document.getElementById('lp-img');if(lp){lp.src=lg;document.getElementById('lp-area').classList.remove('hi');}}}
 function rmLogo(){D.cfg.logo=null;document.getElementById('s-logo').value='';document.getElementById('lp-area').classList.add('hi');['l','al','t','ab'].forEach(function(x){var el=document.getElementById('logo-'+x);var fb=document.getElementById('logo-'+x+'f');if(el)el.classList.add('hi');if(fb)fb.classList.remove('hi');});}
 function upLogo(inp){var f=inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(e){D.cfg.logo=e.target.result;applyLogo();};r.readAsDataURL(f);}
-function ss(id){document.querySelectorAll('.sc').forEach(function(s){s.classList.add('hi');});document.getElementById(id).classList.remove('hi');}
+function ss(id){
+  document.querySelectorAll('.sc').forEach(function(s){s.classList.add('hi');});
+  document.getElementById(id).classList.remove('hi');
+  try{sessionStorage.setItem('curPage',id);}catch(e){}
+}
+function restorePage(){
+  try{
+    var p=sessionStorage.getItem('curPage');
+    if(p&&p!=='sl'&&p!=='sal'&&document.getElementById(p)){
+      // Only restore test-related pages
+      if(p==='st'||p==='sr'||p==='spr'){
+        ss('sl'); // Go home for test pages (can't restore mid-test safely)
+        return;
+      }
+      ss(p);
+    }
+  }catch(e){}
+}
 function aLogin(){
   var entered=document.getElementById('iapwd').value;
   var pwd=(D.cfg&&D.cfg.pwd)?D.cfg.pwd:'hosper2024';
@@ -647,21 +750,66 @@ function startTest(rSecs){
   D.cur=0;ss('st');rTest();
 }
 function rTest(){clearInterval(D.tmr);D.tSec=0;var secs=getAS();document.getElementById('pbar').style.width=Math.round(D.cur/secs.length*100)+'%';document.getElementById('tb-meta').textContent=D.cand.name;document.getElementById('tb-right').textContent='Section '+(D.cur+1)+'/'+secs.length;document.getElementById('rb-area').innerHTML=D.rSecs?'<div class="rb">⚡ Retake Mode — Sirf failed sections</div>':'';var sec=secs[D.cur];var hasV=sec.videoLink&&sec.videoLink.trim()!=='';var dur=(parseInt(sec.videoDuration)||0)*60;var h='<div class="sh"><div class="sh-t">'+sec.section+'</div><div class="sh-s">'+sec.questions.length+' questions • Saare zaroori hain</div><div class="sh-b">Section '+(D.cur+1)+'/'+secs.length+'</div></div>';if(hasV){h+='<div class="vg" id="vg"><div class="vg-top"><div class="vi"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M5 3l14 9-14 9z"/></svg></div><div><div class="vg-t">Pehle Training Video Dekhein</div><div class="vg-s">Video dekhne ke baad test unlock hoga</div></div></div><a href="'+sec.videoLink+'" target="_blank" class="vbtn" onclick="vOpened()"><div class="vbi"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M5 3l14 9-14 9z"/></svg></div><div><div class="vbl">Training Video Kholein</div><div class="vbs">Nayi tab mein khulega</div></div><span style="margin-left:auto;font-size:18px;color:var(--r)">→</span></a><div id="t-area"><div style="font-size:13px;color:#9E7070;text-align:center;padding:10px">⬆ Pehle video link pe click karein</div></div></div>';}h+='<div id="qa"'+(hasV?' style="display:none"':'')+'>'+sec.questions.map(function(q,qi){var a=D.ans[D.cur][qi];return'<div class="qc'+(a!==undefined?' ans':'')+'" id="qc-'+qi+'"><div class="qt"><span class="qn">Q'+(qi+1)+'</span><span class="qm">★ Zaroori</span></div><div class="qq">'+q.question+'</div><div class="opts">'+q.options.map(function(o,oi){return'<button class="ob'+(a===oi?' sel':'')+'" onclick="pickA('+qi+','+oi+',this)"><div class="od"></div>'+o.text+'</button>';}).join('')+'</div></div>';}).join('')+'</div>';document.getElementById('t-content').innerHTML=h;var nav='';if(D.cur>0)nav+='<button class="btn bg" onclick="prevS()">← Pichla</button>';else nav+='<div></div>';if(D.cur<secs.length-1)nav+='<button class="btn bp" id="bn" onclick="nextS()">Agla Section →</button>';else nav+='<button class="btn bs" id="bn" onclick="submitT()">✓ Submit Karein</button>';document.getElementById('t-nav').innerHTML=nav;window.scrollTo(0,0);}
-function vOpened(){var sec=getAS()[D.cur];var dur=(parseInt(sec.videoDuration)||0)*60;if(dur>0){startTmr(dur);}else{document.getElementById('t-area').innerHTML='<div class="tu"><div class="tui"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><polyline points="20 6 9 17 4 12"/></svg></div><div style="font-size:13px;font-weight:800;color:#2E7D32">Video link khul gaya! Ab test karein.</div></div>';unlockQ();}}
+function vOpened(){
+  // If questions already unlocked and user clicks video again - reset section
+  var qa=document.getElementById('qa');
+  if(qa&&qa.style.display!=='none'&&Object.keys(D.ans[D.cur]||{}).length>0){
+    // Questions were visible and some answered - reset this section
+    D.ans[D.cur]={};
+    var sec=getAS()[D.cur];
+    var dur=(parseInt(sec.videoDuration)||0)*60;
+    // Hide questions again
+    qa.style.display='none';
+    if(dur>0){
+      clearInterval(D.tmr);
+      startTmr(dur);
+    } else {
+      document.getElementById('t-area').innerHTML='<div class="tu"><div class="tui"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><polyline points="20 6 9 17 4 12"/></svg></div><div style="font-size:13px;font-weight:800;color:#2E7D32">Video khul gaya! Puri video dekhein phir test dein.</div></div>';
+      unlockQ();
+    }
+    return;
+  }
+  var sec=getAS()[D.cur];
+  var dur=(parseInt(sec.videoDuration)||0)*60;
+  if(dur>0){startTmr(dur);}
+  else{document.getElementById('t-area').innerHTML='<div class="tu"><div class="tui"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><polyline points="20 6 9 17 4 12"/></svg></div><div style="font-size:13px;font-weight:800;color:#2E7D32">Video link khul gaya! Ab test karein.</div></div>';unlockQ();}
+}
 function startTmr(tot){D.tSec=tot;rTmr(tot,tot);D.tmr=setInterval(function(){D.tSec--;if(D.tSec<=0){clearInterval(D.tmr);document.getElementById('t-area').innerHTML='<div class="tu"><div class="tui"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><polyline points="20 6 9 17 4 12"/></svg></div><div style="font-size:13px;font-weight:800;color:#2E7D32">Timer khatam! Test unlock ✓</div></div>';unlockQ();}else rTmr(D.tSec,tot);},1000);}
 function rTmr(rem,tot){var m=Math.floor(rem/60),s=rem%60,str=m+':'+(s<10?'0':'')+s,off=157-(157*(rem/tot));var ta=document.getElementById('t-area');if(!ta)return;ta.innerHTML='<div class="tw"><div class="tr"><svg viewBox="0 0 50 50"><circle class="tr-bg" cx="25" cy="25" r="25"/><circle class="tr-f" cx="25" cy="25" r="25" style="stroke-dashoffset:'+off+'"/></svg><div class="tr-txt">'+str+'</div></div><div><div style="font-size:11px;font-weight:700;color:#9E7070;text-transform:uppercase;letter-spacing:.5px">Timer</div><div style="font-size:13px;font-weight:700;color:#2D1515">Video dekhte rehein...</div><div style="font-size:11px;color:#9E7070;margin-top:2px">Test '+str+' baad unlock hoga</div></div></div>';}
-function unlockQ(){var qa=document.getElementById('qa');if(qa){qa.style.display='';qa.style.animation='up .5s ease';}}
+function unlockQ(){
+  var qa=document.getElementById('qa');
+  if(qa){qa.style.display='';qa.style.animation='up .5s ease';}
+  // Start MCQ timer if not already running
+  if(!D.mcqStart) D.mcqStart=Date.now();
+}
 function pickA(qi,oi,el){D.ans[D.cur][qi]=oi;var c=document.getElementById('qc-'+qi);c.classList.add('ans');c.classList.remove('flg');c.querySelectorAll('.ob').forEach(function(b){b.classList.remove('sel');});el.classList.add('sel');}
 function chkAll(){var sec=getAS()[D.cur];var ok=true;sec.questions.forEach(function(q,qi){if(D.ans[D.cur][qi]===undefined){ok=false;var c=document.getElementById('qc-'+qi);c.classList.add('flg');setTimeout(function(){c.classList.remove('flg');},600);}});if(!ok)alert('Saare questions ka jawab zaroori hai!');return ok;}
 function prevS(){clearInterval(D.tmr);D.cur--;rTest();}
 function nextS(){if(!chkAll())return;clearInterval(D.tmr);D.cur++;rTest();}
-function submitT(){if(!chkAll())return;clearInterval(D.tmr);var secs=getAS();var tQ=0,tC=0,ss2=[];secs.forEach(function(sec,si){var c=0,wq=[];sec.questions.forEach(function(q,qi){var a=D.ans[si][qi];var ok=a!==undefined&&q.options[a]&&q.options[a].correct;if(ok)c++;else wq.push({question:q.question,chosenText:(a!==undefined&&q.options[a])?q.options[a].text:'—',correctText:q.options.filter(function(o){return o.correct;})[0].text,allOptions:q.options});});tQ+=sec.questions.length;tC+=c;ss2.push({section:sec.section,correct:c,total:sec.questions.length,pct:Math.round(c/sec.questions.length*100),wrongQ:wq});});var fSecs,oPct;if(D.rSecs){var prev=null;for(var i=D.res.length-1;i>=0;i--){if(D.res[i].mobile===D.cand.mobile&&!D.res[i].isR){prev=D.res[i];break;}}fSecs=prev?prev.secs.slice():[];D.rSecs.forEach(function(oi,si){fSecs[oi]=ss2[si];});tC=fSecs.reduce(function(s,x){return s+x.correct;},0);tQ=fSecs.reduce(function(s,x){return s+x.total;},0);oPct=Math.round(tC/tQ*100);}else{fSecs=ss2;oPct=Math.round(tC/tQ*100);}var rec={id:Date.now(),name:D.cand.name,empId:D.cand.empId,mobile:D.cand.mobile,email:D.cand.email,designation:D.cand.designation,state:D.cand.state,date:D.cand.date,total:tC,max:tQ,pct:oPct,status:oPct>=D.cfg.pp?'Pass':'Fail',isR:!!D.rSecs,secs:fSecs};D.res.push(rec);save();
+function submitT(){if(!chkAll())return;clearInterval(D.tmr);D.testDuration=getMCQDuration();var secs=getAS();var tQ=0,tC=0,ss2=[];secs.forEach(function(sec,si){var c=0,wq=[];sec.questions.forEach(function(q,qi){var a=D.ans[si][qi];var ok=a!==undefined&&q.options[a]&&q.options[a].correct;if(ok)c++;else wq.push({question:q.question,chosenText:(a!==undefined&&q.options[a])?q.options[a].text:'—',correctText:q.options.filter(function(o){return o.correct;})[0].text,allOptions:q.options});});tQ+=sec.questions.length;tC+=c;ss2.push({section:sec.section,correct:c,total:sec.questions.length,pct:Math.round(c/sec.questions.length*100),wrongQ:wq});});var fSecs,oPct;if(D.rSecs){var prev=null;for(var i=D.res.length-1;i>=0;i--){if(D.res[i].mobile===D.cand.mobile&&!D.res[i].isR){prev=D.res[i];break;}}fSecs=prev?prev.secs.slice():[];D.rSecs.forEach(function(oi,si){fSecs[oi]=ss2[si];});tC=fSecs.reduce(function(s,x){return s+x.correct;},0);tQ=fSecs.reduce(function(s,x){return s+x.total;},0);oPct=Math.round(tC/tQ*100);}else{fSecs=ss2;oPct=Math.round(tC/tQ*100);}var rec={id:Date.now(),name:D.cand.name,empId:D.cand.empId,mobile:D.cand.mobile,email:D.cand.email,designation:D.cand.designation,state:D.cand.state,date:D.cand.date,testDuration:D.testDuration||0,breakTotal:D.breakTotal||0,total:tC,max:tQ,pct:oPct,status:oPct>=D.cfg.pp?'Pass':'Fail',isR:!!D.rSecs,secs:fSecs};D.res.push(rec);save();
   // Save submission record to prevent re-test
   var failIdxs=rec.secs.map(function(s,i){return s.pct<D.cfg.pp?i:-1;}).filter(function(i){return i>=0;});
   var mobKey=rec.mobile.replace(/\D/g,'');
-  FB_SUBMITTED.child(mobKey).set({
-    id:rec.id, name:rec.name, status:rec.status, pct:rec.pct,
-    date:rec.date, failSecs:failIdxs
+  // Count retakes
+  var retakeCount=0;
+  FB_SUBMITTED.child(mobKey).once('value').then(function(ex){
+    var existing=ex.val()||{};
+    retakeCount=(existing.retakeCount||0)+(rec.isR?1:0);
+    var secRetakes=existing.secRetakes||{};
+    // Update per-section retake count
+    if(rec.isR&&D.rSecs){
+      D.rSecs.forEach(function(si){
+        var sname=D.mcq[si]?D.mcq[si].section:'Section '+si;
+        secRetakes[sname]=(secRetakes[sname]||0)+1;
+      });
+    }
+    var newFailSecs=rec.secs.map(function(s,i){return s.pct<(D.cfg.pp||80)?i:-1;}).filter(function(i){return i>=0;});
+    FB_SUBMITTED.child(mobKey).set({
+      id:rec.id, name:rec.name, status:rec.status, pct:rec.pct,
+      date:rec.date, failSecs:newFailSecs,
+      retakeCount:retakeCount, secRetakes:secRetakes,
+      testDuration:D.testDuration||0
+    });
   });
   showRes(rec);
 }
@@ -676,7 +824,50 @@ function showRes(rec){var p=rec.status==='Pass';document.getElementById('r-ring'
 function doRetake(idxs){D.rSecs=idxs;D.ans={};var secs=getAS();for(var i=0;i<secs.length;i++)D.ans[i]={};D.cur=0;ss('st');rTest();}
 function sTab(t){['r','q','s'].forEach(function(x){document.getElementById('tb-'+x).classList.add('hi');document.getElementById('tab-'+x).classList.remove('act');});document.getElementById('tb-'+t).classList.remove('hi');document.getElementById('tab-'+t).classList.add('act');if(t==='r')rResults();if(t==='q')rQTab();if(t==='s'){document.getElementById('s-pct').value=D.cfg.pp;if(D.cfg.logo){document.getElementById('lp-img').src=D.cfg.logo;document.getElementById('lp-area').classList.remove('hi');}}}
 function rResults(){rCodePanel();var q=(document.getElementById('f-q').value||'').toLowerCase();var st=document.getElementById('f-st').value;var t=D.res.length;var p=D.res.filter(function(r){return r.status==='Pass'&&!r.isR;}).length;var f=D.res.filter(function(r){return r.status==='Fail'&&!r.isR;}).length;var rt=D.res.filter(function(r){return r.isR;}).length;var avg=t?Math.round(D.res.reduce(function(s,r){return s+r.pct;},0)/t):0;document.getElementById('a-stats').innerHTML='<div class="stt"><div class="sv">'+t+'</div><div class="slb">Total</div></div><div class="stt"><div class="sv g">'+p+'</div><div class="slb">Passed</div></div><div class="stt"><div class="sv r">'+f+'</div><div class="slb">Failed</div></div><div class="stt"><div class="sv a">'+rt+'</div><div class="slb">Retakes</div></div><div class="stt"><div class="sv">'+avg+'%</div><div class="slb">Avg Score</div></div>';var flt=D.res.filter(function(r){return(!q||(r.name.toLowerCase().includes(q)||r.mobile.includes(q)))&&(!st||(st==='Retake'?r.isR:r.status===st));}).slice().reverse();if(!flt.length){document.getElementById('r-tbody').innerHTML='<tr><td colspan="9" style="text-align:center;color:#9E7070;padding:24px">Koi result nahi</td></tr>';return;}document.getElementById('r-tbody').innerHTML=flt.map(function(r,i){var sb=r.isR?'<span class="bdg br">Retake</span>':'<span class="bdg '+(r.status==='Pass'?'bp2':'bf')+'">'+r.status+'</span>';return'<tr><td>'+(i+1)+'</td><td><b>'+r.name+'</b></td><td>'+r.empId+'</td><td>'+r.mobile+'</td><td>'+r.date+'</td><td>'+r.total+'/'+r.max+'</td><td><b>'+r.pct+'%</b></td><td>'+sb+'</td><td style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn bo bsm" onclick="openD('+r.id+')">Detail</button><button class="btn bsm" style="color:var(--r);border:1.5px solid var(--rm)" onclick="delR('+r.id+')">Del</button></td></tr>';}).join('');}
-function openD(id){var r=D.res.find(function(x){return x.id===id;});if(!r)return;document.getElementById('m-title').textContent=r.name+' — '+r.pct+'% ('+(r.isR?'Retake':r.status)+')';document.getElementById('m-meta').textContent='EMP: '+r.empId+' | '+r.mobile+' | '+(r.email||'')+'| '+(r.designation||'')+' | '+(r.state||'')+' | '+r.date+' | Score: '+r.total+'/'+r.max;var wc=0,h='';(r.secs||[]).forEach(function(s){var sp=s.pct>=D.cfg.pp;h+='<div class="wsh '+(sp?'p':'f')+'">'+(sp?'✓':'✗')+' '+s.section+' — '+s.correct+'/'+s.total+' ('+s.pct+'%)</div>';if(!s.wrongQ||s.wrongQ.length===0){h+='<div style="font-size:12px;color:#388E3C;font-weight:700;padding:6px 0">✓ Saare questions sahi!</div>';}else{wc+=s.wrongQ.length;s.wrongQ.forEach(function(wq){h+='<div class="wqb"><div class="wqt">✗ '+wq.question+'</div>';wq.allOptions.forEach(function(o){var ch=o.text===wq.chosenText,cr=o.correct;var cls=cr?'c':ch?'w':'n';h+='<div class="or2 '+cls+'">'+(cr?'✓ ':ch?'✗ ':'  ')+o.text;if(cr)h+='<span class="ot tc">Sahi</span>';if(ch&&!cr)h+='<span class="ot tw3">Aapne chuna</span>';h+='</div>';});h+='</div>';});} });if(wc>0)h='<div style="background:var(--rl);border-radius:7px;padding:7px 12px;margin-bottom:12px;font-size:12px;color:var(--r);font-weight:800">✗ '+wc+' galat jawab</div>'+h;document.getElementById('m-body').innerHTML=h;document.getElementById('m-detail').classList.remove('hi');}
+function openD(id){
+  var r=D.res.find(function(x){return x.id===id;});
+  if(!r)return;
+  var mobKey=r.mobile.replace(/\D/g,'');
+  FB_SUBMITTED.child(mobKey).once('value').then(function(sub){
+    var sd=sub.val()||{};
+    var rtc=sd.retakeCount||0;
+    var sr=sd.secRetakes||{};
+    var dur=r.testDuration||sd.testDuration||0;
+    var brk=r.breakTotal||0;
+    document.getElementById('m-title').textContent=r.name+' — '+r.pct+'% ('+(r.isR?'Retake':r.status)+')';
+    var metaStr='EMP: '+r.empId+' | '+r.mobile+' | '+(r.email||'')+' | '+(r.designation||'')+' | '+(r.state||'')+' | '+r.date;
+    if(dur>0)metaStr+=' | MCQ Time: '+fmtSecs(dur);
+    if(brk>0)metaStr+=' | Break: '+fmtSecs(brk);
+    if(rtc>0)metaStr+=' | Retakes: '+rtc;
+    document.getElementById('m-meta').textContent=metaStr;
+    var wc=0,h='';
+    if(rtc>0){
+      h+='<div style="background:#FFF8E1;border-radius:8px;padding:8px 14px;margin-bottom:12px;font-size:12px;color:#E65100;font-weight:800">⚡ Total Retakes: '+rtc+'</div>';
+    }
+    if(dur>0||brk>0){
+      h+='<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">';
+      if(dur>0)h+='<div style="background:#E3F2FD;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;color:#1565C0">⏱ MCQ Time: '+fmtSecs(dur)+'</div>';
+      if(brk>0)h+='<div style="background:#FFF8E1;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;color:#E65100">☕ Break: '+fmtSecs(brk)+'</div>';
+      h+='</div>';
+    }
+    (r.secs||[]).forEach(function(s){
+      var sp=s.pct>=(D.cfg.pp||80);
+      var sRet=sr[s.section]||0;
+      h+='<div class="wsh '+(sp?'p':'f')+'">'+(sp?'✓':'✗')+' '+s.section+' — '+s.correct+'/'+s.total+' ('+s.pct+'%)'+(sRet>0?' <span style="color:#E65100;font-size:11px">'+sRet+' retake</span>':'')+'</div>';
+      if(!s.wrongQ||s.wrongQ.length===0){h+='<div style="font-size:12px;color:#388E3C;font-weight:700;padding:6px 0">✓ Saare sahi!</div>';}
+      else{wc+=s.wrongQ.length;s.wrongQ.forEach(function(wq){
+        h+='<div class="wqb"><div class="wqt">✗ '+wq.question+'</div>';
+        wq.allOptions.forEach(function(o){var ch=o.text===wq.chosenText,cr=o.correct;var cls=cr?'c':ch?'w':'n';h+='<div class="or2 '+cls+'">'+(cr?'✓ ':ch?'✗ ':'  ')+o.text;if(cr)h+='<span class="ot tc">Sahi</span>';if(ch&&!cr)h+='<span class="ot tw3">Chuna</span>';h+='</div>';});
+        h+='</div>';
+      });}
+    });
+    if(wc>0)h='<div style="background:var(--rl);border-radius:7px;padding:7px 12px;margin-bottom:12px;font-size:12px;color:var(--r);font-weight:800">✗ '+wc+' galat jawab</div>'+h;
+    h+='<div style="display:flex;gap:8px;margin-top:16px"><button class="btn bp" onclick="showPrint('+r.id+')">🖨️ Print Result</button></div>';
+    document.getElementById('m-body').innerHTML=h;
+    document.getElementById('m-detail').classList.remove('hi');
+  });
+}
+
 function delR(id){conf('Is result delete karein?','Undo nahi hoga.',function(){D.res=D.res.filter(function(r){return r.id!==id;});save();rResults();});}
 function clrAll(){conf('Saare results delete karein?','Saara data permanently delete hoga!',function(){D.res=[];save();rResults();});}
 function rQTab(){var h='';D.mcq.forEach(function(sec,si){h+='<div class="acc"><div class="ach" onclick="tAcc('+si+')"><div class="act2">'+sec.section+'</div><span class="acn">'+sec.questions.length+'</span><button class="btn bsm" style="color:var(--r);border:1.5px solid var(--rm)" onclick="event.stopPropagation();delSec('+si+')">Del</button><span class="acv" id="av-'+si+'">▼</span></div><div class="acb" id="ab-'+si+'"><div style="margin-bottom:12px;padding:10px 12px;background:var(--rp);border-radius:9px;border:2px solid var(--rl)"><div style="font-size:11px;font-weight:800;color:var(--r);margin-bottom:7px">🎬 Video Settings</div><div class="vr"><div style="flex:1"><div style="font-size:11px;font-weight:700;color:#9E7070;margin-bottom:3px">Video Link</div><input class="vri" id="vl-'+si+'" value="'+(sec.videoLink||'')+'" placeholder="Drive/YouTube link" style="width:100%"></div><div><div style="font-size:11px;font-weight:700;color:#9E7070;margin-bottom:3px">Min</div><input class="vri" id="vd-'+si+'" type="number" min="0" value="'+(sec.videoDuration||0)+'" style="width:60px;text-align:center"></div><button class="btn bp bsm" onclick="saveVL('+si+')">Save</button></div>'+(sec.videoLink?'<div style="font-size:11px;color:#388E3C;font-weight:700;margin-top:3px">✓ Video set — '+sec.videoDuration+' min</div>':'')+'</div>'+sec.questions.map(function(q,qi){return'<div class="qr"><div class="qrn">'+(qi+1)+'</div><div style="flex:1"><div class="qrt">'+q.question+'</div><div class="qro">'+q.options.map(function(o){return'<span class="oc'+(o.correct?' ok':'')+'">'+o.text+(o.correct?' ✓':'')+'</span>';}).join('')+'</div></div><button class="btn bsm" style="color:var(--r);border:1.5px solid var(--rm)" onclick="delQ('+si+','+qi+')">Del</button></div>';}).join('')+'<div class="aqb"><div style="font-size:12px;font-weight:800;color:var(--r);margin-bottom:9px">+ Naya Question</div><input class="aqi" id="nq-'+si+'" placeholder="Question likhein..."><div style="font-size:11px;font-weight:700;color:#5C3030;margin-bottom:5px">Options — Sahi ke aage ● dabayein</div><div class="og">'+[0,1,2,3].map(function(oi){return'<div class="oir" id="oir-'+si+'-'+oi+'"><input type="radio" name="nr-'+si+'" value="'+oi+'" onchange="hlOpt('+si+','+oi+')"><input type="text" id="no-'+si+'-'+oi+'" placeholder="Option '+(oi+1)+'"></div>';}).join('')+'</div><button class="btn bs bsm" style="font-size:13px;padding:8px 14px" onclick="addQ('+si+')">Add Question ✓</button></div></div></div>';});document.getElementById('sec-acc').innerHTML=h;}
