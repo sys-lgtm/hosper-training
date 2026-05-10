@@ -207,6 +207,31 @@ tr:hover td{background:var(--rp)}
 .or2.n{background:var(--g1);color:#9E7070;border:1.5px solid var(--g2)}
 .ot{font-size:10px;padding:2px 6px;border-radius:5px;font-weight:800;margin-left:auto;flex-shrink:0}
 .tc{background:#C8E6C9;color:#2E7D32}.tw3{background:var(--rm);color:var(--r)}
+
+@media print {
+  #print-btns,.atb,.tb,.pt,.tn,.rb-area,.rtk,#sync-ind,#install-banner{display:none!important}
+  body{background:#fff!important}
+  .sc{min-height:auto!important}
+  #print-area{box-shadow:none!important;padding:10px!important;border-radius:0!important}
+  .no-print{display:none!important}
+}
+.print-header{background:linear-gradient(135deg,var(--r),#C62020);color:#fff;border-radius:12px;padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;gap:16px}
+.print-logo{width:60px;height:60px;border-radius:10px;object-fit:contain;background:#fff;padding:4px}
+.print-title{font-size:20px;font-weight:900}
+.print-sub{font-size:13px;opacity:.85;margin-top:2px}
+.print-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.print-info-box{background:var(--rp);border:1.5px solid var(--rm);border-radius:10px;padding:12px 14px}
+.print-info-label{font-size:11px;font-weight:700;color:var(--r);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.print-info-val{font-size:14px;font-weight:800;color:#2D1515}
+.print-score-row{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-radius:12px;margin-bottom:16px}
+.print-score-row.pass{background:#E8F5E9;border:2px solid #81C784}
+.print-score-row.fail{background:var(--rl);border:2px solid var(--rm)}
+.print-sec-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
+.print-sec-table th{background:var(--r);color:#fff;padding:9px 12px;text-align:left;font-weight:700}
+.print-sec-table td{padding:8px 12px;border-bottom:1px solid var(--g1)}
+.print-sec-table tr:last-child td{border-bottom:none}
+.print-sec-table tr:nth-child(even) td{background:var(--rp)}
+.print-footer{margin-top:16px;padding-top:12px;border-top:2px solid var(--rm);font-size:11px;color:#9E7070;text-align:center}
 @media(max-width:500px){.lc,.alc,.rc{padding:22px 16px}.tbd,.abd{padding:12px 10px}.og{grid-template-columns:1fr}.at{padding:0 10px;font-size:11px}}
 </style>
 <link rel="manifest" id="pwa-manifest">
@@ -221,18 +246,32 @@ tr:hover td{background:var(--rp)}
 <!-- LANDING -->
 <div id="sync-ind" style="display:none;position:fixed;top:58px;right:12px;background:#388E3C;color:#fff;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,.2);font-family:Nunito,Arial,sans-serif"></div>
 <div class="sc" id="sl">
-<div class="lc">
+<div class="lc" style="max-width:480px;padding:28px 24px">
   <img id="logo-l" class="logo hi" src="" alt="Hosper">
   <div id="logo-lf" class="logo-fb">H</div>
   <div class="ttag">Hosper Sales Training</div>
   <div class="ttl">Training Test Portal</div>
   <div class="tsub">Sales Officer Assessment System</div>
   <div class="div"></div>
-  <div class="fg"><label class="lbl">Aapka Poora Naam *</label><input class="inp" id="iname" placeholder="Full name likhein"></div>
-  <div class="fg"><label class="lbl">Employee ID</label><input class="inp" id="iempid" placeholder="EMP-001 (optional)"></div>
-  <div class="fg"><label class="lbl">Mobile Number *</label><input class="inp" id="imob" type="tel" placeholder="10 digit mobile"></div>
-  <button class="btn bp bw" onclick="startTest(null)">▶ Test Shuru Karein</button>
-  <div style="margin-top:14px;font-size:13px;color:#9E7070">Admin? <a onclick="ss('sal')" style="color:var(--r);font-weight:800;cursor:pointer">Login karein →</a></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div class="fg" style="margin-bottom:0"><label class="lbl">Poora Naam *</label><input class="inp" id="iname" placeholder="Full name"></div>
+    <div class="fg" style="margin-bottom:0"><label class="lbl">Mobile Number *</label><input class="inp" id="imob" type="tel" placeholder="10 digit"></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+    <div class="fg" style="margin-bottom:0"><label class="lbl">Email ID *</label><input class="inp" id="iemail" type="email" placeholder="email@example.com"></div>
+    <div class="fg" style="margin-bottom:0"><label class="lbl">Designation *</label><select class="inp" id="idesig"><option value="">Select...</option><option>Sales Officer</option><option>ASM</option><option>TSM</option><option>BM</option><option>Other</option></select></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+    <div class="fg" style="margin-bottom:0"><label class="lbl">State *</label><select class="inp" id="istate"><option value="">Select...</option><option>Andhra Pradesh</option><option>Bihar</option><option>Chhattisgarh</option><option>Delhi</option><option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option><option>Jharkhand</option><option>Karnataka</option><option>Kerala</option><option>Madhya Pradesh</option><option>Maharashtra</option><option>Odisha</option><option>Punjab</option><option>Rajasthan</option><option>Tamil Nadu</option><option>Telangana</option><option>Uttar Pradesh</option><option>Uttarakhand</option><option>West Bengal</option><option>Other</option></select></div>
+    <div class="fg" style="margin-bottom:0"><label class="lbl">Employee ID</label><input class="inp" id="iempid" placeholder="EMP-001 (optional)"></div>
+  </div>
+  <div style="margin-top:10px;padding:14px;background:var(--rp);border:2px solid var(--rm);border-radius:10px">
+    <label class="lbl" style="color:var(--r)">🔐 Login Code *</label>
+    <input class="inp" id="icode" type="text" placeholder="Admin se mila code dalein" style="border-color:var(--rm);letter-spacing:3px;font-size:18px;font-weight:800;text-align:center;text-transform:uppercase" maxlength="8">
+    <div style="font-size:11px;color:#9E7070;margin-top:5px;text-align:center">Yeh code aapke trainer ne diya hoga</div>
+  </div>
+  <button class="btn bp bw" style="margin-top:14px" onclick="validateAndStart()">▶ Test Shuru Karein</button>
+  <div style="margin-top:12px;text-align:center;font-size:13px;color:#9E7070">Admin? <a onclick="ss('sal')" style="color:var(--r);font-weight:800;cursor:pointer">Login karein →</a></div>
 </div>
 </div>
 
@@ -303,6 +342,11 @@ tr:hover td{background:var(--rp)}
   </div>
   <div id="tb-r" class="abd">
     <div class="sgr" id="a-stats"></div>
+    <!-- LOGIN CODE PANEL -->
+    <div class="pan" style="margin-bottom:16px">
+      <div class="ph"><div class="pt2">🔐 Login Codes — Sales Officers Ke Liye</div><button class="btn bp bsm" onclick="addCode()">+ New Code</button></div>
+      <div class="pb" id="code-panel"><div style="text-align:center;padding:16px;color:#9E7070;font-size:13px">Loading...</div></div>
+    </div>
     <div class="pan">
       <div class="ph"><div class="pt2">Candidates Results</div><div style="display:flex;gap:6px"><button class="btn bo bsm" onclick="expCSV()">CSV</button><button class="btn bsm" style="color:var(--r);border:1.5px solid var(--rm)" onclick="clrAll()">Clear All</button></div></div>
       <div class="pb">
@@ -310,7 +354,7 @@ tr:hover td{background:var(--rp)}
           <select class="fsi" id="f-st" onchange="rResults()"><option value="">All Status</option><option value="Pass">Pass</option><option value="Fail">Fail</option><option value="Retake">Retake</option></select>
           <input class="fii" id="f-q" placeholder="Naam ya mobile..." oninput="rResults()">
         </div>
-        <div class="tw2"><table><thead><tr><th>#</th><th>Naam</th><th>EMP</th><th>Mobile</th><th>Date</th><th>Score</th><th>%</th><th>Status</th><th>Action</th></tr></thead><tbody id="r-tbody"></tbody></table></div>
+        <div class="tw2"><table><thead><tr><th>#</th><th>Naam</th><th>Mobile</th><th>Email</th><th>Designation</th><th>State</th><th>Date</th><th>Score</th><th>%</th><th>Status</th><th>Action</th></tr></thead><tbody id="r-tbody"></tbody></table></div>
       </div>
     </div>
   </div>
@@ -344,6 +388,19 @@ tr:hover td{background:var(--rp)}
   </div>
 </div>
 
+
+<!-- PRINT RESULT -->
+<div class="sc hi" id="spr">
+<div style="max-width:700px;margin:0 auto;padding:20px 14px;width:100%">
+  <div style="background:#fff;border-radius:16px;padding:28px;box-shadow:0 4px 20px rgba(168,22,40,.1)" id="print-area">
+    <!-- Print content injected by JS -->
+  </div>
+  <div style="display:flex;gap:10px;margin-top:14px;justify-content:center" id="print-btns">
+    <button class="btn bp" onclick="window.print()">🖨️ Print / PDF Save Karein</button>
+    <button class="btn bo" onclick="ss('sr')">← Wapas</button>
+  </div>
+</div>
+</div>
 <!-- DETAIL MODAL -->
 <div class="mo hi" id="m-detail" onclick="mBgClick(event,'m-detail')">
   <div class="mb2"><div class="mh"><div><div class="mt" id="m-title"></div><div class="mm" id="m-meta"></div></div><button class="mc" onclick="document.getElementById('m-detail').classList.add('hi')">✕</button></div><div id="m-body"></div></div>
@@ -374,8 +431,124 @@ var db=firebase.database();
 var FB_MCQ=db.ref('mcq');
 var FB_RES=db.ref('results');
 var FB_CFG=db.ref('config');
+var FB_CODES=db.ref('login_codes');
+var FB_SUBMITTED=db.ref('submitted');
 function showSync(msg,col){var el=document.getElementById('sync-ind');if(el){el.textContent=msg;el.style.background=col||'#388E3C';el.style.display='block';setTimeout(function(){el.style.display='none';},2500);}}
 var D={mcq:[],res:[],cfg:{pp:80,pwd:'hosper2024',logo:LOGO_DATA},cand:{},ans:{},cur:0,rSecs:null,tmr:null,tSec:0};
+
+// ===== WATERMARK =====
+function addWatermark(){
+  var old=document.getElementById('wm-overlay');
+  if(old)old.remove();
+  var wm=document.createElement('div');
+  wm.id='wm-overlay';
+  wm.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:1000;overflow:hidden;';
+  var txt=D.cand.name+' • '+D.cand.mobile+' • '+new Date().toLocaleDateString('en-IN');
+  var wmHtml='';
+  for(var i=0;i<12;i++){
+    wmHtml+='<div style="position:absolute;opacity:0.07;font-size:13px;font-weight:700;color:#A81628;white-space:nowrap;transform:rotate(-35deg);top:'+(8+i*14)+'%;left:'+(i%2===0?'-10':'10')+'%">'+txt+'</div>';
+  }
+  wm.innerHTML=wmHtml;
+  document.body.appendChild(wm);
+  // Screenshot detection (context menu / print screen key)
+  document.addEventListener('contextmenu',function(e){e.preventDefault();});
+  document.addEventListener('keydown',function(e){
+    if(e.key==='PrintScreen'){
+      navigator.clipboard&&navigator.clipboard.writeText('Screenshot blocked - Hosper Training Portal');
+      alert('Screenshot allowed nahi hai!');
+    }
+    if(e.ctrlKey&&(e.key==='p'||e.key==='P')){e.preventDefault();}
+  });
+}
+
+// ===== PRINT RESULT =====
+function showPrint(id){
+  var rec=D.res.find(function(r){return r.id===id;});
+  if(!rec)return;
+  var isPass=rec.status==='Pass';
+  var logoSrc='data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCABQAFADASIAAhEBAxEB/8QAGQABAQEBAQEAAAAAAAAAAAAAAAcEBgIB/8QANBAAAQMDAwIEAwUJAAAAAAAAAQACAwQFEQYSIRMxIkFRkQeBoRUjQlJxFBYkMjVhdLLB/8QAGQEBAAMBAQAAAAAAAAAAAAAAAAECAwQG/8QAJhEAAgEDAwMEAwAAAAAAAAAAAAERAgMSBCExUWFxExRBkYGx8P/aAAwDAQACEQMRAD8A5RERcR7oIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCLVao2TXeiikaHsfURtc09iC4AhUKu0nEPiHRNgsg+yekOrth+53Yf38s52/RWVLZzXdTTaqiro39EzRd5FpGguOsb11v4S1W0hz2w+H8IOB6DgkrPctPafuemaq9aafUM/YietDMSctHJPPI4OVODKrWW5S33jwp4k4tF3r9N6YsVioKq9x19RJWsDnTU+dkRIBxx27+ec4Kz6dsunJdMXC93WCpkhpalzB05CHBnhxwMZPiTBj3lGLqScTHnwcUioR0Lam6roKZkk0tur6aSZgL8PaWgHv6eILDcrTpRtxo7fQQ3BlQ+vZBL1twaWbsO2k+fblMGRTrLdTSSb2nj+6HFoqZXaI03VS3C2241NNcKGFshc95cw7hkZz5cc9lMs5GfUKHS0a2NRReTx+Ovc22b+uW/wDyov8AcKq19+uUHxJorPHOBRTRBz49g5O1574z5BR4HGCDgr0ZHl28yO3D8W4591NNUGd/Sq9VL6NffyVOhqIKjU+rLFJM2KavwIS44yentI+oOP1WCG2y6K0Jd2XWWEVNfmOKJj92fDt/6T+inRcS7cXEuznOefdfZJZJXbpZHyEcAvcXH6qczL2TmMttp26FZ0jQ6koaaGnuklHPZnU+77x2XxgjIbyOw7HOQsdorbfbtH6hq6ejirKGK4vMUD/5HsywDuDxzkfJTPry9LpdaTp/k3nb7dl5D3BpaHuDT3GeD8kzKvQ5NuqrlrhRx+ee5QtM6kqtS6/pZ6iNkMcNNKyKGPkNGBnnzPb2WnUFJqN19tNVdn0jqOK6MZTiHO8BzuM/JqmjXFhy1xafUHC+maR2MyvODkZeSme25d6NK4qqISiOPPfuWK8n7W/eGyW8imuQjjk3s4dUMLBwT7t/tkeqjZBaS0gtI4IIwQvXVfu39R+78245915Jzkk5JUVVZGum0/oJqZ4/R//Z';
+  var html2='<div class="print-header">';
+  html2+='<img class="print-logo" src="'+logoSrc+'" alt="Hosper">';
+  html2+='<div><div class="print-title">Hosper Sales Training</div><div class="print-sub">Training Test Result Certificate</div></div>';
+  html2+='</div>';
+  html2+='<div class="print-info-grid">';
+  html2+='<div class="print-info-box"><div class="print-info-label">Candidate Name</div><div class="print-info-val">'+rec.name+'</div></div>';
+  html2+='<div class="print-info-box"><div class="print-info-label">Employee ID</div><div class="print-info-val">'+rec.empId+'</div></div>';
+  html2+='<div class="print-info-box"><div class="print-info-label">Mobile</div><div class="print-info-val">'+rec.mobile+'</div></div>';
+  html2+='<div class="print-info-box"><div class="print-info-label">Email</div><div class="print-info-val">'+(rec.email||'-')+'</div></div>';
+  html2+='<div class="print-info-box"><div class="print-info-label">Designation</div><div class="print-info-val">'+(rec.designation||'-')+'</div></div>';
+  html2+='<div class="print-info-box"><div class="print-info-label">State</div><div class="print-info-val">'+(rec.state||'-')+'</div></div>';
+  html2+='<div class="print-info-box"><div class="print-info-label">Test Date</div><div class="print-info-val">'+rec.date+'</div></div>';
+  html2+='<div class="print-info-box"><div class="print-info-label">Result Type</div><div class="print-info-val">'+(rec.isR?'Retake':'First Attempt')+'</div></div>';
+  html2+='</div>';
+  html2+='<div class="print-score-row '+(isPass?'pass':'fail')+'">';
+  html2+='<div><div style="font-size:13px;font-weight:700;color:'+(isPass?'#2E7D32':'#A81628')+'">Overall Result</div><div style="font-size:24px;font-weight:900;color:'+(isPass?'#2E7D32':'#A81628')+'">'+(isPass?'✓ PASS':'✗ FAIL')+'</div></div>';
+  html2+='<div style="text-align:right"><div style="font-size:32px;font-weight:900;color:'+(isPass?'#2E7D32':'#A81628')+'">'+rec.pct+'%</div><div style="font-size:13px;color:#666">'+rec.total+'/'+rec.max+' marks</div></div>';
+  html2+='</div>';
+  html2+='<table class="print-sec-table"><thead><tr><th>#</th><th>Section</th><th>Score</th><th>Percentage</th><th>Status</th></tr></thead><tbody>';
+  rec.secs.forEach(function(s,i){
+    var sp=s.pct>=(D.cfg.pp||80);
+    html2+='<tr><td>'+(i+1)+'</td><td>'+s.section+'</td><td>'+s.correct+'/'+s.total+'</td><td>'+s.pct+'%</td><td style="font-weight:800;color:'+(sp?'#2E7D32':'#A81628')+'">'+(sp?'Pass':'Fail')+'</td></tr>';
+  });
+  html2+='</tbody></table>';
+  html2+='<div class="print-footer">Generated on '+new Date().toLocaleString('en-IN')+' | Hosper Bharat Electrical Industries | Confidential</div>';
+  document.getElementById('print-area').innerHTML=html2;
+  ss('spr');
+}
+
+// ===== ADMIN - LOGIN CODE MANAGEMENT =====
+function genCode(){
+  var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var code='';
+  for(var i=0;i<6;i++) code+=chars[Math.floor(Math.random()*chars.length)];
+  return code;
+}
+
+function rCodePanel(){
+  FB_CODES.once('value').then(function(s){
+    var codes=s.val()||{};
+    var codeList=Object.entries(codes);
+    var h='<div style="margin-bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">';
+    h+='<button class="btn bp bsm" onclick="addCode()">+ New Code Generate Karein</button>';
+    h+='<button class="btn bsm" style="color:var(--r);border:1.5px solid var(--rm)" onclick="clearCodes()">Saare Codes Delete</button>';
+    h+='</div>';
+    if(codeList.length===0){
+      h+='<div style="text-align:center;padding:20px;color:#9E7070;font-size:13px">Koi active code nahi hai</div>';
+    } else {
+      h+='<div style="display:grid;gap:8px">';
+      codeList.forEach(function(entry){
+        var key=entry[0],code=entry[1];
+        h+='<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--rp);border:2px solid var(--rm);border-radius:10px">';
+        h+='<div style="flex:1"><div style="font-size:20px;font-weight:900;color:var(--r);letter-spacing:4px">'+code+'</div>';
+        h+='<div style="font-size:11px;color:#9E7070;margin-top:2px">Sales Officer ko yeh code bhejein</div></div>';
+        h+='<button class="btn bo bsm" id="cpb-'+key+'" onclick="cpCode('+JSON.stringify(code)+')">Copy</button>';
+        h+='<button class="btn bsm" style="color:var(--r);border:1.5px solid var(--rm)" onclick="dlCode('+JSON.stringify(key)+')">Delete</button>';
+        h+='</div>';
+      });
+      h+='</div>';
+    }
+    document.getElementById('code-panel').innerHTML=h;
+  });
+}
+function cpCode(c){navigator.clipboard&&navigator.clipboard.writeText(c);alert('Code copy hua: '+c+'\n\nSales Officer ko bhejein!');}
+function dlCode(k){FB_CODES.child(k).remove().then(function(){rCodePanel();});}
+
+function addCode(){
+  var code=genCode();
+  FB_CODES.push(code).then(function(){
+    showSync('✓ New Code: '+code,'#388E3C');
+    rCodePanel();
+  });
+}
+
+function clearCodes(){
+  if(!confirm('Saare codes delete karein?'))return;
+  FB_CODES.remove().then(function(){rCodePanel();});
+}
+
+
+
+
 function load(){
   // Load settings/password from localStorage (stays on admin device)
   try{var c=localStorage.getItem('hc');if(c)Object.assign(D.cfg,JSON.parse(c));}catch(e){}
@@ -412,7 +585,67 @@ function aLogin(){
 }
 function mBgClick(e,id){if(e.target.id===id)document.getElementById(id).classList.add('hi');}
 function getAS(){return D.rSecs?D.rSecs.map(function(i){return D.mcq[i];}):D.mcq;}
-function startTest(rSecs){var nm=document.getElementById('iname').value.trim();var mb=document.getElementById('imob').value.trim();if(!nm){alert('Naam zaroori hai!');return;}if(!mb||mb.replace(/\D/g,'').length<10){alert('Sahi 10 digit mobile daalein!');return;}D.cand={name:nm,empId:document.getElementById('iempid').value.trim()||'-',mobile:mb,date:new Date().toLocaleDateString('en-IN')};D.rSecs=rSecs||null;D.ans={};var secs=getAS();for(var i=0;i<secs.length;i++)D.ans[i]={};D.cur=0;ss('st');rTest();}
+function validateAndStart(){
+  var nm=document.getElementById('iname').value.trim();
+  var mb=document.getElementById('imob').value.trim();
+  var em=document.getElementById('iemail').value.trim();
+  var dsg=document.getElementById('idesig').value;
+  var st=document.getElementById('istate').value;
+  var code=document.getElementById('icode').value.trim().toUpperCase();
+  if(!nm){alert('Naam zaroori hai!');return;}
+  if(!mb||mb.replace(/\D/g,'').length<10){alert('Sahi 10 digit mobile daalein!');return;}
+  if(!em||!em.includes('@')){alert('Sahi email daalein!');return;}
+  if(!dsg){alert('Designation select karein!');return;}
+  if(!st){alert('State select karein!');return;}
+  if(!code){alert('Login code daalein!');return;}
+  // Verify login code
+  FB_CODES.once('value').then(function(s){
+    var codes=s.val();
+    var validCodes=codes?Object.values(codes).map(function(c){return c.toString().toUpperCase();}):[];
+    if(validCodes.length===0||validCodes.indexOf(code)===-1){
+      alert('Galat Login Code! Apne trainer se sahi code lein.');
+      return;
+    }
+    // Check if already submitted
+    FB_SUBMITTED.child(mb.replace(/\D/g,'')).once('value').then(function(sub){
+      var submitted=sub.val();
+      if(submitted&&submitted.status==='Pass'){
+        // Show their result
+        showPrevResult(submitted);
+        return;
+      }
+      if(submitted&&submitted.failSecs&&submitted.failSecs.length>0){
+        // Has pending retake
+        D.cand={name:nm,empId:document.getElementById('iempid').value.trim()||'-',mobile:mb,email:em,designation:dsg,state:st,date:new Date().toLocaleDateString('en-IN')};
+        if(confirm('Aapne pehle test diya hai. Aapke '+submitted.failSecs.length+' sections fail hue the. Kya aap sirf un sections ka retake dena chahte hain?')){
+          startTest(submitted.failSecs);
+        } else {
+          showPrevResult(submitted);
+        }
+        return;
+      }
+      // Fresh start
+      D.cand={name:nm,empId:document.getElementById('iempid').value.trim()||'-',mobile:mb,email:em,designation:dsg,state:st,date:new Date().toLocaleDateString('en-IN')};
+      startTest(null);
+    });
+  }).catch(function(){alert('Network error! Internet check karein.');});
+}
+
+function showPrevResult(data){
+  // Reconstruct result object from submitted data and show
+  if(data&&data.id){
+    var rec=D.res.find(function(r){return r.id===data.id;});
+    if(rec){showRes(rec);return;}
+  }
+  alert('Aapka result: '+data.status+' ('+data.pct+'%). Kisi nayi device pe dekhen ya admin se contact karein.');
+}
+
+function startTest(rSecs){
+  D.rSecs=rSecs||null;D.ans={};
+  var secs=getAS();
+  for(var i=0;i<secs.length;i++)D.ans[i]={};
+  D.cur=0;ss('st');rTest();
+}
 function rTest(){clearInterval(D.tmr);D.tSec=0;var secs=getAS();document.getElementById('pbar').style.width=Math.round(D.cur/secs.length*100)+'%';document.getElementById('tb-meta').textContent=D.cand.name;document.getElementById('tb-right').textContent='Section '+(D.cur+1)+'/'+secs.length;document.getElementById('rb-area').innerHTML=D.rSecs?'<div class="rb">⚡ Retake Mode — Sirf failed sections</div>':'';var sec=secs[D.cur];var hasV=sec.videoLink&&sec.videoLink.trim()!=='';var dur=(parseInt(sec.videoDuration)||0)*60;var h='<div class="sh"><div class="sh-t">'+sec.section+'</div><div class="sh-s">'+sec.questions.length+' questions • Saare zaroori hain</div><div class="sh-b">Section '+(D.cur+1)+'/'+secs.length+'</div></div>';if(hasV){h+='<div class="vg" id="vg"><div class="vg-top"><div class="vi"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M5 3l14 9-14 9z"/></svg></div><div><div class="vg-t">Pehle Training Video Dekhein</div><div class="vg-s">Video dekhne ke baad test unlock hoga</div></div></div><a href="'+sec.videoLink+'" target="_blank" class="vbtn" onclick="vOpened()"><div class="vbi"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M5 3l14 9-14 9z"/></svg></div><div><div class="vbl">Training Video Kholein</div><div class="vbs">Nayi tab mein khulega</div></div><span style="margin-left:auto;font-size:18px;color:var(--r)">→</span></a><div id="t-area"><div style="font-size:13px;color:#9E7070;text-align:center;padding:10px">⬆ Pehle video link pe click karein</div></div></div>';}h+='<div id="qa"'+(hasV?' style="display:none"':'')+'>'+sec.questions.map(function(q,qi){var a=D.ans[D.cur][qi];return'<div class="qc'+(a!==undefined?' ans':'')+'" id="qc-'+qi+'"><div class="qt"><span class="qn">Q'+(qi+1)+'</span><span class="qm">★ Zaroori</span></div><div class="qq">'+q.question+'</div><div class="opts">'+q.options.map(function(o,oi){return'<button class="ob'+(a===oi?' sel':'')+'" onclick="pickA('+qi+','+oi+',this)"><div class="od"></div>'+o.text+'</button>';}).join('')+'</div></div>';}).join('')+'</div>';document.getElementById('t-content').innerHTML=h;var nav='';if(D.cur>0)nav+='<button class="btn bg" onclick="prevS()">← Pichla</button>';else nav+='<div></div>';if(D.cur<secs.length-1)nav+='<button class="btn bp" id="bn" onclick="nextS()">Agla Section →</button>';else nav+='<button class="btn bs" id="bn" onclick="submitT()">✓ Submit Karein</button>';document.getElementById('t-nav').innerHTML=nav;window.scrollTo(0,0);}
 function vOpened(){var sec=getAS()[D.cur];var dur=(parseInt(sec.videoDuration)||0)*60;if(dur>0){startTmr(dur);}else{document.getElementById('t-area').innerHTML='<div class="tu"><div class="tui"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><polyline points="20 6 9 17 4 12"/></svg></div><div style="font-size:13px;font-weight:800;color:#2E7D32">Video link khul gaya! Ab test karein.</div></div>';unlockQ();}}
 function startTmr(tot){D.tSec=tot;rTmr(tot,tot);D.tmr=setInterval(function(){D.tSec--;if(D.tSec<=0){clearInterval(D.tmr);document.getElementById('t-area').innerHTML='<div class="tu"><div class="tui"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><polyline points="20 6 9 17 4 12"/></svg></div><div style="font-size:13px;font-weight:800;color:#2E7D32">Timer khatam! Test unlock ✓</div></div>';unlockQ();}else rTmr(D.tSec,tot);},1000);}
@@ -422,12 +655,28 @@ function pickA(qi,oi,el){D.ans[D.cur][qi]=oi;var c=document.getElementById('qc-'
 function chkAll(){var sec=getAS()[D.cur];var ok=true;sec.questions.forEach(function(q,qi){if(D.ans[D.cur][qi]===undefined){ok=false;var c=document.getElementById('qc-'+qi);c.classList.add('flg');setTimeout(function(){c.classList.remove('flg');},600);}});if(!ok)alert('Saare questions ka jawab zaroori hai!');return ok;}
 function prevS(){clearInterval(D.tmr);D.cur--;rTest();}
 function nextS(){if(!chkAll())return;clearInterval(D.tmr);D.cur++;rTest();}
-function submitT(){if(!chkAll())return;clearInterval(D.tmr);var secs=getAS();var tQ=0,tC=0,ss2=[];secs.forEach(function(sec,si){var c=0,wq=[];sec.questions.forEach(function(q,qi){var a=D.ans[si][qi];var ok=a!==undefined&&q.options[a]&&q.options[a].correct;if(ok)c++;else wq.push({question:q.question,chosenText:(a!==undefined&&q.options[a])?q.options[a].text:'—',correctText:q.options.filter(function(o){return o.correct;})[0].text,allOptions:q.options});});tQ+=sec.questions.length;tC+=c;ss2.push({section:sec.section,correct:c,total:sec.questions.length,pct:Math.round(c/sec.questions.length*100),wrongQ:wq});});var fSecs,oPct;if(D.rSecs){var prev=null;for(var i=D.res.length-1;i>=0;i--){if(D.res[i].mobile===D.cand.mobile&&!D.res[i].isR){prev=D.res[i];break;}}fSecs=prev?prev.secs.slice():[];D.rSecs.forEach(function(oi,si){fSecs[oi]=ss2[si];});tC=fSecs.reduce(function(s,x){return s+x.correct;},0);tQ=fSecs.reduce(function(s,x){return s+x.total;},0);oPct=Math.round(tC/tQ*100);}else{fSecs=ss2;oPct=Math.round(tC/tQ*100);}var rec={id:Date.now(),name:D.cand.name,empId:D.cand.empId,mobile:D.cand.mobile,date:D.cand.date,total:tC,max:tQ,pct:oPct,status:oPct>=D.cfg.pp?'Pass':'Fail',isR:!!D.rSecs,secs:fSecs};D.res.push(rec);save();showRes(rec);}
-function showRes(rec){var p=rec.status==='Pass';document.getElementById('r-ring').className='sc2 '+(p?'p':'f');document.getElementById('r-pct').className='spct '+(p?'p':'f');document.getElementById('r-pct').textContent=rec.pct+'%';document.getElementById('r-name').textContent=rec.name;document.getElementById('r-meta').textContent='EMP: '+rec.empId+' | '+rec.date+(rec.isR?' | Retake':'');var st=document.getElementById('r-status');st.className='stb '+(p?'p':'f');st.textContent=p?'✓ PASS — Congratulations!':'✗ FAIL — Dobara koshish karo';document.getElementById('r-total').textContent=rec.total+'/'+rec.max+' ('+rec.pct+'%)';var fi=[],h='';rec.secs.forEach(function(s,i){var sp=s.pct>=D.cfg.pp;if(!sp)fi.push(i);var col=sp?'#388E3C':'var(--r)';h+='<div class="srr"><div class="srd" style="background:'+col+'"></div><div class="srn">'+s.section+'</div><div style="font-size:11px;color:#9E7070">'+s.correct+'/'+s.total+'</div><div class="mb"><div class="mf" style="width:'+s.pct+'%;background:'+col+'"></div></div><div style="font-size:11px;font-weight:800;color:'+col+';width:32px;text-align:right">'+s.pct+'%</div></div>';});document.getElementById('r-secs').innerHTML=h;var rh='';if(!p&&fi.length){rh='<div class="rtk"><div style="font-size:13px;font-weight:800;color:#E65100;margin-bottom:6px">⚡ Failed Sections — Retake Available</div>'+fi.map(function(i){return'<div style="font-size:12px;color:#BF360C;font-weight:600">• '+rec.secs[i].section+' ('+rec.secs[i].pct+'%)</div>';}).join('')+'<button class="btn bp" style="margin-top:10px;font-size:13px;padding:9px 18px" onclick="doRetake('+JSON.stringify(fi)+')">Sirf Failed Sections Ka Retake →</button></div>';}document.getElementById('r-retake').innerHTML=rh;ss('sr');}
+function submitT(){if(!chkAll())return;clearInterval(D.tmr);var secs=getAS();var tQ=0,tC=0,ss2=[];secs.forEach(function(sec,si){var c=0,wq=[];sec.questions.forEach(function(q,qi){var a=D.ans[si][qi];var ok=a!==undefined&&q.options[a]&&q.options[a].correct;if(ok)c++;else wq.push({question:q.question,chosenText:(a!==undefined&&q.options[a])?q.options[a].text:'—',correctText:q.options.filter(function(o){return o.correct;})[0].text,allOptions:q.options});});tQ+=sec.questions.length;tC+=c;ss2.push({section:sec.section,correct:c,total:sec.questions.length,pct:Math.round(c/sec.questions.length*100),wrongQ:wq});});var fSecs,oPct;if(D.rSecs){var prev=null;for(var i=D.res.length-1;i>=0;i--){if(D.res[i].mobile===D.cand.mobile&&!D.res[i].isR){prev=D.res[i];break;}}fSecs=prev?prev.secs.slice():[];D.rSecs.forEach(function(oi,si){fSecs[oi]=ss2[si];});tC=fSecs.reduce(function(s,x){return s+x.correct;},0);tQ=fSecs.reduce(function(s,x){return s+x.total;},0);oPct=Math.round(tC/tQ*100);}else{fSecs=ss2;oPct=Math.round(tC/tQ*100);}var rec={id:Date.now(),name:D.cand.name,empId:D.cand.empId,mobile:D.cand.mobile,email:D.cand.email,designation:D.cand.designation,state:D.cand.state,date:D.cand.date,total:tC,max:tQ,pct:oPct,status:oPct>=D.cfg.pp?'Pass':'Fail',isR:!!D.rSecs,secs:fSecs};D.res.push(rec);save();
+  // Save submission record to prevent re-test
+  var failIdxs=rec.secs.map(function(s,i){return s.pct<D.cfg.pp?i:-1;}).filter(function(i){return i>=0;});
+  var mobKey=rec.mobile.replace(/\D/g,'');
+  FB_SUBMITTED.child(mobKey).set({
+    id:rec.id, name:rec.name, status:rec.status, pct:rec.pct,
+    date:rec.date, failSecs:failIdxs
+  });
+  showRes(rec);
+}
+function showRes(rec){var p=rec.status==='Pass';document.getElementById('r-ring').className='sc2 '+(p?'p':'f');document.getElementById('r-pct').className='spct '+(p?'p':'f');document.getElementById('r-pct').textContent=rec.pct+'%';document.getElementById('r-name').textContent=rec.name;document.getElementById('r-meta').textContent='EMP: '+rec.empId+' | '+rec.date+(rec.isR?' | Retake':'');var st=document.getElementById('r-status');st.className='stb '+(p?'p':'f');st.textContent=p?'✓ PASS — Congratulations!':'✗ FAIL — Dobara koshish karo';document.getElementById('r-total').textContent=rec.total+'/'+rec.max+' ('+rec.pct+'%)';var fi=[],h='';rec.secs.forEach(function(s,i){var sp=s.pct>=D.cfg.pp;if(!sp)fi.push(i);var col=sp?'#388E3C':'var(--r)';h+='<div class="srr"><div class="srd" style="background:'+col+'"></div><div class="srn">'+s.section+'</div><div style="font-size:11px;color:#9E7070">'+s.correct+'/'+s.total+'</div><div class="mb"><div class="mf" style="width:'+s.pct+'%;background:'+col+'"></div></div><div style="font-size:11px;font-weight:800;color:'+col+';width:32px;text-align:right">'+s.pct+'%</div></div>';});document.getElementById('r-secs').innerHTML=h;var rh='';if(!p&&fi.length){rh='<div class="rtk"><div style="font-size:13px;font-weight:800;color:#E65100;margin-bottom:6px">⚡ Failed Sections — Retake Available</div>'+fi.map(function(i){return'<div style="font-size:12px;color:#BF360C;font-weight:600">• '+rec.secs[i].section+' ('+rec.secs[i].pct+'%)</div>';}).join('')+'<button class="btn bp" style="margin-top:10px;font-size:13px;padding:9px 18px" onclick="doRetake('+JSON.stringify(fi)+')">Sirf Failed Sections Ka Retake →</button></div>';}document.getElementById('r-retake').innerHTML=rh;
+  // Add print button
+  var pb='<button class="btn bp" style="margin-top:10px;width:100%" onclick="showPrint('+rec.id+')">🖨️ Result Print / Save Karein</button>';
+  document.getElementById('r-retake').innerHTML=rh+pb;
+  ss('sr');
+  // Anti-screenshot watermark
+  addWatermark();
+}
 function doRetake(idxs){D.rSecs=idxs;D.ans={};var secs=getAS();for(var i=0;i<secs.length;i++)D.ans[i]={};D.cur=0;ss('st');rTest();}
 function sTab(t){['r','q','s'].forEach(function(x){document.getElementById('tb-'+x).classList.add('hi');document.getElementById('tab-'+x).classList.remove('act');});document.getElementById('tb-'+t).classList.remove('hi');document.getElementById('tab-'+t).classList.add('act');if(t==='r')rResults();if(t==='q')rQTab();if(t==='s'){document.getElementById('s-pct').value=D.cfg.pp;if(D.cfg.logo){document.getElementById('lp-img').src=D.cfg.logo;document.getElementById('lp-area').classList.remove('hi');}}}
-function rResults(){var q=(document.getElementById('f-q').value||'').toLowerCase();var st=document.getElementById('f-st').value;var t=D.res.length;var p=D.res.filter(function(r){return r.status==='Pass'&&!r.isR;}).length;var f=D.res.filter(function(r){return r.status==='Fail'&&!r.isR;}).length;var rt=D.res.filter(function(r){return r.isR;}).length;var avg=t?Math.round(D.res.reduce(function(s,r){return s+r.pct;},0)/t):0;document.getElementById('a-stats').innerHTML='<div class="stt"><div class="sv">'+t+'</div><div class="slb">Total</div></div><div class="stt"><div class="sv g">'+p+'</div><div class="slb">Passed</div></div><div class="stt"><div class="sv r">'+f+'</div><div class="slb">Failed</div></div><div class="stt"><div class="sv a">'+rt+'</div><div class="slb">Retakes</div></div><div class="stt"><div class="sv">'+avg+'%</div><div class="slb">Avg Score</div></div>';var flt=D.res.filter(function(r){return(!q||(r.name.toLowerCase().includes(q)||r.mobile.includes(q)))&&(!st||(st==='Retake'?r.isR:r.status===st));}).slice().reverse();if(!flt.length){document.getElementById('r-tbody').innerHTML='<tr><td colspan="9" style="text-align:center;color:#9E7070;padding:24px">Koi result nahi</td></tr>';return;}document.getElementById('r-tbody').innerHTML=flt.map(function(r,i){var sb=r.isR?'<span class="bdg br">Retake</span>':'<span class="bdg '+(r.status==='Pass'?'bp2':'bf')+'">'+r.status+'</span>';return'<tr><td>'+(i+1)+'</td><td><b>'+r.name+'</b></td><td>'+r.empId+'</td><td>'+r.mobile+'</td><td>'+r.date+'</td><td>'+r.total+'/'+r.max+'</td><td><b>'+r.pct+'%</b></td><td>'+sb+'</td><td style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn bo bsm" onclick="openD('+r.id+')">Detail</button><button class="btn bsm" style="color:var(--r);border:1.5px solid var(--rm)" onclick="delR('+r.id+')">Del</button></td></tr>';}).join('');}
-function openD(id){var r=D.res.find(function(x){return x.id===id;});if(!r)return;document.getElementById('m-title').textContent=r.name+' — '+r.pct+'% ('+(r.isR?'Retake':r.status)+')';document.getElementById('m-meta').textContent='EMP: '+r.empId+' | '+r.mobile+' | '+r.date+' | '+r.total+'/'+r.max;var wc=0,h='';(r.secs||[]).forEach(function(s){var sp=s.pct>=D.cfg.pp;h+='<div class="wsh '+(sp?'p':'f')+'">'+(sp?'✓':'✗')+' '+s.section+' — '+s.correct+'/'+s.total+' ('+s.pct+'%)</div>';if(!s.wrongQ||s.wrongQ.length===0){h+='<div style="font-size:12px;color:#388E3C;font-weight:700;padding:6px 0">✓ Saare questions sahi!</div>';}else{wc+=s.wrongQ.length;s.wrongQ.forEach(function(wq){h+='<div class="wqb"><div class="wqt">✗ '+wq.question+'</div>';wq.allOptions.forEach(function(o){var ch=o.text===wq.chosenText,cr=o.correct;var cls=cr?'c':ch?'w':'n';h+='<div class="or2 '+cls+'">'+(cr?'✓ ':ch?'✗ ':'  ')+o.text;if(cr)h+='<span class="ot tc">Sahi</span>';if(ch&&!cr)h+='<span class="ot tw3">Aapne chuna</span>';h+='</div>';});h+='</div>';});} });if(wc>0)h='<div style="background:var(--rl);border-radius:7px;padding:7px 12px;margin-bottom:12px;font-size:12px;color:var(--r);font-weight:800">✗ '+wc+' galat jawab</div>'+h;document.getElementById('m-body').innerHTML=h;document.getElementById('m-detail').classList.remove('hi');}
+function rResults(){rCodePanel();var q=(document.getElementById('f-q').value||'').toLowerCase();var st=document.getElementById('f-st').value;var t=D.res.length;var p=D.res.filter(function(r){return r.status==='Pass'&&!r.isR;}).length;var f=D.res.filter(function(r){return r.status==='Fail'&&!r.isR;}).length;var rt=D.res.filter(function(r){return r.isR;}).length;var avg=t?Math.round(D.res.reduce(function(s,r){return s+r.pct;},0)/t):0;document.getElementById('a-stats').innerHTML='<div class="stt"><div class="sv">'+t+'</div><div class="slb">Total</div></div><div class="stt"><div class="sv g">'+p+'</div><div class="slb">Passed</div></div><div class="stt"><div class="sv r">'+f+'</div><div class="slb">Failed</div></div><div class="stt"><div class="sv a">'+rt+'</div><div class="slb">Retakes</div></div><div class="stt"><div class="sv">'+avg+'%</div><div class="slb">Avg Score</div></div>';var flt=D.res.filter(function(r){return(!q||(r.name.toLowerCase().includes(q)||r.mobile.includes(q)))&&(!st||(st==='Retake'?r.isR:r.status===st));}).slice().reverse();if(!flt.length){document.getElementById('r-tbody').innerHTML='<tr><td colspan="9" style="text-align:center;color:#9E7070;padding:24px">Koi result nahi</td></tr>';return;}document.getElementById('r-tbody').innerHTML=flt.map(function(r,i){var sb=r.isR?'<span class="bdg br">Retake</span>':'<span class="bdg '+(r.status==='Pass'?'bp2':'bf')+'">'+r.status+'</span>';return'<tr><td>'+(i+1)+'</td><td><b>'+r.name+'</b></td><td>'+r.empId+'</td><td>'+r.mobile+'</td><td>'+r.date+'</td><td>'+r.total+'/'+r.max+'</td><td><b>'+r.pct+'%</b></td><td>'+sb+'</td><td style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn bo bsm" onclick="openD('+r.id+')">Detail</button><button class="btn bsm" style="color:var(--r);border:1.5px solid var(--rm)" onclick="delR('+r.id+')">Del</button></td></tr>';}).join('');}
+function openD(id){var r=D.res.find(function(x){return x.id===id;});if(!r)return;document.getElementById('m-title').textContent=r.name+' — '+r.pct+'% ('+(r.isR?'Retake':r.status)+')';document.getElementById('m-meta').textContent='EMP: '+r.empId+' | '+r.mobile+' | '+(r.email||'')+'| '+(r.designation||'')+' | '+(r.state||'')+' | '+r.date+' | Score: '+r.total+'/'+r.max;var wc=0,h='';(r.secs||[]).forEach(function(s){var sp=s.pct>=D.cfg.pp;h+='<div class="wsh '+(sp?'p':'f')+'">'+(sp?'✓':'✗')+' '+s.section+' — '+s.correct+'/'+s.total+' ('+s.pct+'%)</div>';if(!s.wrongQ||s.wrongQ.length===0){h+='<div style="font-size:12px;color:#388E3C;font-weight:700;padding:6px 0">✓ Saare questions sahi!</div>';}else{wc+=s.wrongQ.length;s.wrongQ.forEach(function(wq){h+='<div class="wqb"><div class="wqt">✗ '+wq.question+'</div>';wq.allOptions.forEach(function(o){var ch=o.text===wq.chosenText,cr=o.correct;var cls=cr?'c':ch?'w':'n';h+='<div class="or2 '+cls+'">'+(cr?'✓ ':ch?'✗ ':'  ')+o.text;if(cr)h+='<span class="ot tc">Sahi</span>';if(ch&&!cr)h+='<span class="ot tw3">Aapne chuna</span>';h+='</div>';});h+='</div>';});} });if(wc>0)h='<div style="background:var(--rl);border-radius:7px;padding:7px 12px;margin-bottom:12px;font-size:12px;color:var(--r);font-weight:800">✗ '+wc+' galat jawab</div>'+h;document.getElementById('m-body').innerHTML=h;document.getElementById('m-detail').classList.remove('hi');}
 function delR(id){conf('Is result delete karein?','Undo nahi hoga.',function(){D.res=D.res.filter(function(r){return r.id!==id;});save();rResults();});}
 function clrAll(){conf('Saare results delete karein?','Saara data permanently delete hoga!',function(){D.res=[];save();rResults();});}
 function rQTab(){var h='';D.mcq.forEach(function(sec,si){h+='<div class="acc"><div class="ach" onclick="tAcc('+si+')"><div class="act2">'+sec.section+'</div><span class="acn">'+sec.questions.length+'</span><button class="btn bsm" style="color:var(--r);border:1.5px solid var(--rm)" onclick="event.stopPropagation();delSec('+si+')">Del</button><span class="acv" id="av-'+si+'">▼</span></div><div class="acb" id="ab-'+si+'"><div style="margin-bottom:12px;padding:10px 12px;background:var(--rp);border-radius:9px;border:2px solid var(--rl)"><div style="font-size:11px;font-weight:800;color:var(--r);margin-bottom:7px">🎬 Video Settings</div><div class="vr"><div style="flex:1"><div style="font-size:11px;font-weight:700;color:#9E7070;margin-bottom:3px">Video Link</div><input class="vri" id="vl-'+si+'" value="'+(sec.videoLink||'')+'" placeholder="Drive/YouTube link" style="width:100%"></div><div><div style="font-size:11px;font-weight:700;color:#9E7070;margin-bottom:3px">Min</div><input class="vri" id="vd-'+si+'" type="number" min="0" value="'+(sec.videoDuration||0)+'" style="width:60px;text-align:center"></div><button class="btn bp bsm" onclick="saveVL('+si+')">Save</button></div>'+(sec.videoLink?'<div style="font-size:11px;color:#388E3C;font-weight:700;margin-top:3px">✓ Video set — '+sec.videoDuration+' min</div>':'')+'</div>'+sec.questions.map(function(q,qi){return'<div class="qr"><div class="qrn">'+(qi+1)+'</div><div style="flex:1"><div class="qrt">'+q.question+'</div><div class="qro">'+q.options.map(function(o){return'<span class="oc'+(o.correct?' ok':'')+'">'+o.text+(o.correct?' ✓':'')+'</span>';}).join('')+'</div></div><button class="btn bsm" style="color:var(--r);border:1.5px solid var(--rm)" onclick="delQ('+si+','+qi+')">Del</button></div>';}).join('')+'<div class="aqb"><div style="font-size:12px;font-weight:800;color:var(--r);margin-bottom:9px">+ Naya Question</div><input class="aqi" id="nq-'+si+'" placeholder="Question likhein..."><div style="font-size:11px;font-weight:700;color:#5C3030;margin-bottom:5px">Options — Sahi ke aage ● dabayein</div><div class="og">'+[0,1,2,3].map(function(oi){return'<div class="oir" id="oir-'+si+'-'+oi+'"><input type="radio" name="nr-'+si+'" value="'+oi+'" onchange="hlOpt('+si+','+oi+')"><input type="text" id="no-'+si+'-'+oi+'" placeholder="Option '+(oi+1)+'"></div>';}).join('')+'</div><button class="btn bs bsm" style="font-size:13px;padding:8px 14px" onclick="addQ('+si+')">Add Question ✓</button></div></div></div>';});document.getElementById('sec-acc').innerHTML=h;}
