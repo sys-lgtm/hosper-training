@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Hosper Training Test</title>
+<!-- VERSION 6 - Fixed -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -142,10 +143,10 @@ body{font-family:'Nunito',Arial,sans-serif;background:#FFF5F5;color:#2D1515;min-
 .pt2{font-size:14px;font-weight:800;color:#2D1515}
 .pb{padding:18px}
 /* Table */
-.tw2{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:13px}
+.tw2{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:860px}.tw2{overflow-x:auto;-webkit-overflow-scrolling:touch}
 th{text-align:left;padding:9px 11px;background:var(--rp);font-weight:800;color:#5C3030;border-bottom:2px solid var(--rl);white-space:nowrap}
-td{padding:9px 11px;border-bottom:1px solid var(--g1);vertical-align:middle}
+td{padding:8px 10px;border-bottom:1px solid var(--g1);vertical-align:middle;word-break:break-word;overflow:hidden}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:var(--rp)}
 .fr{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap}
@@ -320,7 +321,7 @@ tr:hover td{background:var(--rp)}
   <div id="r-secs"></div>
   <div class="rtr"><span style="font-size:13px;font-weight:700;color:#5C3030">Total Score</span><span style="font-size:17px;font-weight:900;color:#2D1515" id="r-total"></span></div>
   <div id="r-retake"></div>
-  <button class="btn bo bw" style="margin-top:12px" onclick="ss('sl')">Home Jaein</button>
+  
 </div>
 </div>
 </div>
@@ -354,7 +355,20 @@ tr:hover td{background:var(--rp)}
           <select class="fsi" id="f-st" onchange="rResults()"><option value="">All Status</option><option value="Pass">Pass</option><option value="Fail">Fail</option><option value="Retake">Retake</option></select>
           <input class="fii" id="f-q" placeholder="Naam ya mobile..." oninput="rResults()">
         </div>
-        <div class="tw2"><table><thead><tr><th>#</th><th>Naam</th><th>Mobile</th><th>Email</th><th>Designation</th><th>State</th><th>Date</th><th>Score</th><th>%</th><th>Status</th><th>Action</th></tr></thead><tbody id="r-tbody"></tbody></table></div>
+        <div class="tw2"><table><thead><tr>
+<th style="width:30px">#</th>
+<th style="width:120px">Naam</th>
+<th style="width:100px">Mobile</th>
+<th style="width:130px">Email</th>
+<th style="width:90px">Designation</th>
+<th style="width:80px">State</th>
+<th style="width:80px">Date</th>
+<th style="width:60px">Score</th>
+<th style="width:45px">%</th>
+<th style="width:60px">Status</th>
+<th style="width:60px">Retakes</th>
+<th style="width:160px">Action</th>
+</tr></thead><tbody id="r-tbody"></tbody></table></div>
       </div>
     </div>
   </div>
@@ -889,10 +903,12 @@ function submitT(){if(!chkAll())return;clearInterval(D.tmr);D.testDuration=getMC
   showRes(rec);
 }
 function showRes(rec){var p=rec.status==='Pass';document.getElementById('r-ring').className='sc2 '+(p?'p':'f');document.getElementById('r-pct').className='spct '+(p?'p':'f');document.getElementById('r-pct').textContent=rec.pct+'%';document.getElementById('r-name').textContent=rec.name;document.getElementById('r-meta').textContent='EMP: '+rec.empId+' | '+rec.date+(rec.isR?' | Retake':'');var st=document.getElementById('r-status');st.className='stb '+(p?'p':'f');st.textContent=p?'✓ PASS — Congratulations!':'✗ FAIL — Dobara koshish karo';document.getElementById('r-total').textContent=rec.total+'/'+rec.max+' ('+rec.pct+'%)';var passPct=D.cfg&&D.cfg.pp?D.cfg.pp:80;var fi=[],h='';rec.secs.forEach(function(s,i){var sp=s.pct>=passPct;if(!sp)fi.push(i);var col=sp?'#388E3C':'var(--r)';h+='<div class="srr"><div class="srd" style="background:'+col+'"></div><div class="srn">'+s.section+'</div><div style="font-size:11px;color:#9E7070">'+s.correct+'/'+s.total+'</div><div class="mb"><div class="mf" style="width:'+s.pct+'%;background:'+col+'"></div></div><div style="font-size:11px;font-weight:800;color:'+col+';width:32px;text-align:right">'+s.pct+'%</div></div>';});document.getElementById('r-secs').innerHTML=h;var rh='';if(fi.length>0){rh='<div class="rtk"><div style="font-size:13px;font-weight:800;color:#E65100;margin-bottom:6px">⚡ Failed Sections — Retake Available</div>'+fi.map(function(i){return'<div style="font-size:12px;color:#BF360C;font-weight:600">• '+rec.secs[i].section+' ('+rec.secs[i].pct+'%)</div>';}).join('')+'<button class="btn bp" style="margin-top:10px;font-size:13px;padding:9px 18px" onclick="doRetake('+JSON.stringify(fi)+')">Sirf Failed Sections Ka Retake →</button></div>';}document.getElementById('r-retake').innerHTML=rh;
-  // No print button for sales officer - only admin can print
+  // If passed - show congratulations message
+  if(p){
+    rh+='<div style="background:#E8F5E9;border-radius:10px;padding:14px;margin-top:12px;text-align:center;font-size:13px;font-weight:700;color:#2E7D32">🎉 Aapne test pass kar liya! Admin se result lein.</div>';
+  }
   document.getElementById('r-retake').innerHTML=rh;
   ss('sr');
-  // Anti-screenshot watermark
   addWatermark();
 }
 function doRetake(idxs){
@@ -910,7 +926,37 @@ function doRetake(idxs){
   rTest();
 }
 function sTab(t){['r','q','s'].forEach(function(x){document.getElementById('tb-'+x).classList.add('hi');document.getElementById('tab-'+x).classList.remove('act');});document.getElementById('tb-'+t).classList.remove('hi');document.getElementById('tab-'+t).classList.add('act');if(t==='r')rResults();if(t==='q')rQTab();if(t==='s'){document.getElementById('s-pct').value=D.cfg.pp;if(D.cfg.logo){document.getElementById('lp-img').src=D.cfg.logo;document.getElementById('lp-area').classList.remove('hi');}}}
-function rResults(){rCodePanel();var q=(document.getElementById('f-q').value||'').toLowerCase();var st=document.getElementById('f-st').value;var t=D.res.length;var p=D.res.filter(function(r){return r.status==='Pass'&&!r.isR;}).length;var f=D.res.filter(function(r){return r.status==='Fail'&&!r.isR;}).length;var rt=D.res.filter(function(r){return r.isR;}).length;var avg=t?Math.round(D.res.reduce(function(s,r){return s+r.pct;},0)/t):0;document.getElementById('a-stats').innerHTML='<div class="stt"><div class="sv">'+t+'</div><div class="slb">Total</div></div><div class="stt"><div class="sv g">'+p+'</div><div class="slb">Passed</div></div><div class="stt"><div class="sv r">'+f+'</div><div class="slb">Failed</div></div><div class="stt"><div class="sv a">'+rt+'</div><div class="slb">Retakes</div></div><div class="stt"><div class="sv">'+avg+'%</div><div class="slb">Avg Score</div></div>';var flt=D.res.filter(function(r){return(!q||(r.name.toLowerCase().includes(q)||r.mobile.includes(q)))&&(!st||(st==='Retake'?r.isR:r.status===st));}).slice().reverse();if(!flt.length){document.getElementById('r-tbody').innerHTML='<tr><td colspan="9" style="text-align:center;color:#9E7070;padding:24px">Koi result nahi</td></tr>';return;}document.getElementById('r-tbody').innerHTML=flt.map(function(r,i){var sb=r.isR?'<span class="bdg br">Retake</span>':'<span class="bdg '+(r.status==='Pass'?'bp2':'bf')+'">'+r.status+'</span>';return'<tr><td>'+(i+1)+'</td><td><b>'+r.name+'</b></td><td>'+r.empId+'</td><td>'+r.mobile+'</td><td>'+r.date+'</td><td>'+r.total+'/'+r.max+'</td><td><b>'+r.pct+'%</b></td><td>'+sb+'</td><td style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn bo bsm" onclick="openD('+r.id+')">Detail</button><button class="btn bsm" style="color:var(--r);border:1.5px solid var(--rm)" onclick="delR('+r.id+')">Del</button></td></tr>';}).join('');}
+function rResults(){rCodePanel();var q=(document.getElementById('f-q').value||'').toLowerCase();var st=document.getElementById('f-st').value;var t=D.res.length;var p=D.res.filter(function(r){return r.status==='Pass'&&!r.isR;}).length;var f=D.res.filter(function(r){return r.status==='Fail'&&!r.isR;}).length;var rt=D.res.filter(function(r){return r.isR;}).length;var avg=t?Math.round(D.res.reduce(function(s,r){return s+r.pct;},0)/t):0;document.getElementById('a-stats').innerHTML='<div class="stt"><div class="sv">'+t+'</div><div class="slb">Total</div></div><div class="stt"><div class="sv g">'+p+'</div><div class="slb">Passed</div></div><div class="stt"><div class="sv r">'+f+'</div><div class="slb">Failed</div></div><div class="stt"><div class="sv a">'+rt+'</div><div class="slb">Retakes</div></div><div class="stt"><div class="sv">'+avg+'%</div><div class="slb">Avg Score</div></div>';var flt=D.res.filter(function(r){return(!q||(r.name.toLowerCase().includes(q)||r.mobile.includes(q)))&&(!st||(st==='Retake'?r.isR:r.status===st));}).slice().reverse();if(!flt.length){document.getElementById('r-tbody').innerHTML='<tr><td colspan="9" style="text-align:center;color:#9E7070;padding:24px">Koi result nahi</td></tr>';return;}document.getElementById('r-tbody').innerHTML=flt.map(function(r,i){
+  var sb=r.isR?'<span class="bdg br">Retake</span>':'<span class="bdg '+(r.status==='Pass'?'bp2':'bf')+'">'+r.status+'</span>';
+  return'<tr>'+
+    '<td>'+(i+1)+'</td>'+
+    '<td><b>'+r.name+'</b><br><span style="font-size:10px;color:#9E7070">'+r.empId+'</span></td>'+
+    '<td style="font-size:12px">'+r.mobile+'</td>'+
+    '<td style="font-size:12px">'+(r.email||'-')+'</td>'+
+    '<td style="font-size:12px">'+(r.designation||'-')+'</td>'+
+    '<td style="font-size:12px">'+(r.state||'-')+'</td>'+
+    '<td style="font-size:12px;white-space:nowrap">'+r.date+'</td>'+
+    '<td style="white-space:nowrap">'+r.total+'/'+r.max+'</td>'+
+    '<td><b>'+r.pct+'%</b></td>'+
+    '<td>'+sb+'</td>'+
+    '<td id="rtc-'+r.id+'" style="font-weight:700;color:#E65100;text-align:center">—</td>'+
+    '<td style="display:flex;gap:4px;flex-wrap:wrap">'+
+      '<button class="btn bo bsm" onclick="openD('+r.id+')">Detail</button>'+
+      '<button class="btn bp bsm" onclick="showPrint('+r.id+')">Print</button>'+
+      '<button class="btn bsm" style="color:var(--r);border:1.5px solid var(--rm)" onclick="delR('+r.id+')">Del</button>'+
+    '</td>'+
+  '</tr>';
+}).join('');
+// Load retake counts async
+flt.forEach(function(r){
+  var mk=r.mobile.replace(/\D/g,'');
+  FB_SUBMITTED.child(mk).once('value').then(function(s){
+    var d=s.val()||{};
+    var el=document.getElementById('rtc-'+r.id);
+    if(el)el.textContent=(d.retakeCount||0)>0?(d.retakeCount)+'x':'—';
+  });
+});
+}
 function openD(id){
   var r=D.res.find(function(x){return x.id===id;});
   if(!r)return;
@@ -923,32 +969,66 @@ function openD(id){
     var brk=r.breakTotal||0;
     document.getElementById('m-title').textContent=r.name+' — '+r.pct+'% ('+(r.isR?'Retake':r.status)+')';
     var metaStr='EMP: '+r.empId+' | '+r.mobile+' | '+(r.email||'')+' | '+(r.designation||'')+' | '+(r.state||'')+' | '+r.date;
-    if(dur>0)metaStr+=' | MCQ Time: '+fmtSecs(dur);
-    if(brk>0)metaStr+=' | Break: '+fmtSecs(brk);
-    if(rtc>0)metaStr+=' | Retakes: '+rtc;
     document.getElementById('m-meta').textContent=metaStr;
-    var wc=0,h='';
-    if(rtc>0){
-      h+='<div style="background:#FFF8E1;border-radius:8px;padding:8px 14px;margin-bottom:12px;font-size:12px;color:#E65100;font-weight:800">⚡ Total Retakes: '+rtc+'</div>';
-    }
-    if(dur>0||brk>0){
-      h+='<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">';
-      if(dur>0)h+='<div style="background:#E3F2FD;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;color:#1565C0">⏱ MCQ Time: '+fmtSecs(dur)+'</div>';
-      if(brk>0)h+='<div style="background:#FFF8E1;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;color:#E65100">☕ Break: '+fmtSecs(brk)+'</div>';
-      h+='</div>';
-    }
-    (r.secs||[]).forEach(function(s){
+    
+    var h='';
+    
+    // --- Summary Row: Duration, Break, Total Retakes ---
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">';
+    h+='<div style="background:#E3F2FD;border-radius:10px;padding:10px;text-align:center"><div style="font-size:11px;color:#1565C0;font-weight:700">⏱ MCQ Duration</div><div style="font-size:16px;font-weight:900;color:#1565C0">'+(dur>0?fmtSecs(dur):'—')+'</div></div>';
+    h+='<div style="background:#FFF8E1;border-radius:10px;padding:10px;text-align:center"><div style="font-size:11px;color:#E65100;font-weight:700">☕ Total Break</div><div style="font-size:16px;font-weight:900;color:#E65100">'+(brk>0?fmtSecs(brk):'—')+'</div></div>';
+    h+='<div style="background:'+(rtc>0?'#FFEBEE':'#E8F5E9')+'";border-radius:10px;padding:10px;text-align:center"><div style="font-size:11px;color:'+(rtc>0?'#C62828':'#2E7D32')+';font-weight:700">🔁 Total Retakes</div><div style="font-size:16px;font-weight:900;color:'+(rtc>0?'#C62828':'#2E7D32')+'">'+(rtc>0?rtc+'x':'0 (First Try)')+'</div></div>';
+    h+='</div>';
+    
+    // --- Section-wise Retake Table ---
+    h+='<div style="margin-bottom:14px"><div style="font-size:13px;font-weight:800;color:#2D1515;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid var(--rl)">📊 Section-wise Performance & Retakes</div>';
+    h+='<table style="width:100%;border-collapse:collapse;font-size:12px;min-width:unset"><thead><tr>';
+    h+='<th style="background:var(--r);color:#fff;padding:8px 10px;text-align:left;font-weight:700;border-radius:6px 0 0 0">Section</th>';
+    h+='<th style="background:var(--r);color:#fff;padding:8px 10px;text-align:center;font-weight:700">Score</th>';
+    h+='<th style="background:var(--r);color:#fff;padding:8px 10px;text-align:center;font-weight:700">%</th>';
+    h+='<th style="background:var(--r);color:#fff;padding:8px 10px;text-align:center;font-weight:700">Status</th>';
+    h+='<th style="background:var(--r);color:#fff;padding:8px 10px;text-align:center;font-weight:700;border-radius:0 6px 0 0">Retakes</th>';
+    h+='</tr></thead><tbody>';
+    r.secs.forEach(function(s,i){
       var sp=s.pct>=(D.cfg.pp||80);
       var sRet=sr[s.section]||0;
-      h+='<div class="wsh '+(sp?'p':'f')+'">'+(sp?'✓':'✗')+' '+s.section+' — '+s.correct+'/'+s.total+' ('+s.pct+'%)'+(sRet>0?' <span style="color:#E65100;font-size:11px">'+sRet+' retake</span>':'')+'</div>';
-      if(!s.wrongQ||s.wrongQ.length===0){h+='<div style="font-size:12px;color:#388E3C;font-weight:700;padding:6px 0">✓ Saare sahi!</div>';}
-      else{wc+=s.wrongQ.length;s.wrongQ.forEach(function(wq){
-        h+='<div class="wqb"><div class="wqt">✗ '+wq.question+'</div>';
-        wq.allOptions.forEach(function(o){var ch=o.text===wq.chosenText,cr=o.correct;var cls=cr?'c':ch?'w':'n';h+='<div class="or2 '+cls+'">'+(cr?'✓ ':ch?'✗ ':'  ')+o.text;if(cr)h+='<span class="ot tc">Sahi</span>';if(ch&&!cr)h+='<span class="ot tw3">Chuna</span>';h+='</div>';});
-        h+='</div>';
-      });}
+      var bg=i%2===0?'#fff':'var(--rp)';
+      h+='<tr style="background:'+bg+'">';
+      h+='<td style="padding:7px 10px;font-weight:600;border-bottom:1px solid var(--g1)">'+s.section+'</td>';
+      h+='<td style="padding:7px 10px;text-align:center;border-bottom:1px solid var(--g1)">'+s.correct+'/'+s.total+'</td>';
+      h+='<td style="padding:7px 10px;text-align:center;border-bottom:1px solid var(--g1);font-weight:700;color:'+(sp?'#2E7D32':'#A81628')+'">'+s.pct+'%</td>';
+      h+='<td style="padding:7px 10px;text-align:center;border-bottom:1px solid var(--g1)"><span style="background:'+(sp?'#E8F5E9':'#FFEBEE')+';color:'+(sp?'#2E7D32':'#A81628')+';padding:2px 8px;border-radius:10px;font-size:11px;font-weight:800">'+(sp?'Pass':'Fail')+'</span></td>';
+      h+='<td style="padding:7px 10px;text-align:center;border-bottom:1px solid var(--g1);font-weight:800;color:'+(sRet>0?'#E65100':'#888')+'">'+(sRet>0?sRet+'x':'—')+'</td>';
+      h+='</tr>';
     });
-    if(wc>0)h='<div style="background:var(--rl);border-radius:7px;padding:7px 12px;margin-bottom:12px;font-size:12px;color:var(--r);font-weight:800">✗ '+wc+' galat jawab</div>'+h;
+    h+='</tbody></table></div>';
+    
+    // --- Wrong Questions Detail ---
+    var wc=0,wh='';
+    r.secs.forEach(function(s){
+      var sp=s.pct>=(D.cfg.pp||80);
+      var sRet=sr[s.section]||0;
+      wh+='<div class="wsh '+(sp?'p':'f')+'">'+(sp?'✓':'✗')+' '+s.section+(sRet>0?' <span style="font-size:11px;color:#E65100;font-weight:700">('+sRet+' retake)</span>':'')+'</div>';
+      if(!s.wrongQ||s.wrongQ.length===0){
+        wh+='<div style="font-size:12px;color:#388E3C;font-weight:700;padding:6px 0 10px">✓ Saare questions sahi!</div>';
+      } else {
+        wc+=s.wrongQ.length;
+        s.wrongQ.forEach(function(wq){
+          wh+='<div class="wqb"><div class="wqt">✗ '+wq.question+'</div>';
+          wq.allOptions.forEach(function(o){
+            var ch=o.text===wq.chosenText,cr=o.correct;
+            var cls=cr?'c':ch?'w':'n';
+            wh+='<div class="or2 '+cls+'">'+(cr?'✓ ':ch?'✗ ':'  ')+o.text;
+            if(cr)wh+='<span class="ot tc">Sahi</span>';
+            if(ch&&!cr)wh+='<span class="ot tw3">Chuna</span>';
+            wh+='</div>';
+          });
+          wh+='</div>';
+        });
+      }
+    });
+    if(wc>0) h+='<div style="font-size:13px;font-weight:800;color:#2D1515;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid var(--rl)">❌ Galat Jawab ('+wc+')</div>';
+    h+=wh;
     h+='<div style="display:flex;gap:8px;margin-top:16px"><button class="btn bp" onclick="showPrint('+r.id+')">🖨️ Print Result</button></div>';
     document.getElementById('m-body').innerHTML=h;
     document.getElementById('m-detail').classList.remove('hi');
