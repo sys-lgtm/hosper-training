@@ -791,11 +791,8 @@ function validateAndStart(){
       if(submitted&&submitted.failSecs&&submitted.failSecs.length>0){
         // Has pending retake
         D.cand={name:nm,empId:document.getElementById('iempid').value.trim()||'-',mobile:mb,email:em,designation:dsg,state:st,date:new Date().toLocaleDateString('en-IN')};
-        if(confirm('Aapne pehle test diya hai. Aapke '+submitted.failSecs.length+' sections fail hue the. Kya aap sirf un sections ka retake dena chahte hain?')){
-          startTest(submitted.failSecs);
-        } else {
-          showPrevResult(submitted);
-        }
+        // Auto start retake for failed sections
+        startTest(submitted.failSecs);
         return;
       }
       // Fresh start
@@ -891,15 +888,27 @@ function submitT(){if(!chkAll())return;clearInterval(D.tmr);D.testDuration=getMC
   });
   showRes(rec);
 }
-function showRes(rec){var p=rec.status==='Pass';document.getElementById('r-ring').className='sc2 '+(p?'p':'f');document.getElementById('r-pct').className='spct '+(p?'p':'f');document.getElementById('r-pct').textContent=rec.pct+'%';document.getElementById('r-name').textContent=rec.name;document.getElementById('r-meta').textContent='EMP: '+rec.empId+' | '+rec.date+(rec.isR?' | Retake':'');var st=document.getElementById('r-status');st.className='stb '+(p?'p':'f');st.textContent=p?'✓ PASS — Congratulations!':'✗ FAIL — Dobara koshish karo';document.getElementById('r-total').textContent=rec.total+'/'+rec.max+' ('+rec.pct+'%)';var fi=[],h='';rec.secs.forEach(function(s,i){var sp=s.pct>=D.cfg.pp;if(!sp)fi.push(i);var col=sp?'#388E3C':'var(--r)';h+='<div class="srr"><div class="srd" style="background:'+col+'"></div><div class="srn">'+s.section+'</div><div style="font-size:11px;color:#9E7070">'+s.correct+'/'+s.total+'</div><div class="mb"><div class="mf" style="width:'+s.pct+'%;background:'+col+'"></div></div><div style="font-size:11px;font-weight:800;color:'+col+';width:32px;text-align:right">'+s.pct+'%</div></div>';});document.getElementById('r-secs').innerHTML=h;var rh='';if(!p&&fi.length){rh='<div class="rtk"><div style="font-size:13px;font-weight:800;color:#E65100;margin-bottom:6px">⚡ Failed Sections — Retake Available</div>'+fi.map(function(i){return'<div style="font-size:12px;color:#BF360C;font-weight:600">• '+rec.secs[i].section+' ('+rec.secs[i].pct+'%)</div>';}).join('')+'<button class="btn bp" style="margin-top:10px;font-size:13px;padding:9px 18px" onclick="doRetake('+JSON.stringify(fi)+')">Sirf Failed Sections Ka Retake →</button></div>';}document.getElementById('r-retake').innerHTML=rh;
-  // Add print button
-  var pb='<button class="btn bp" style="margin-top:10px;width:100%" onclick="showPrint('+rec.id+')">🖨️ Result Print / Save Karein</button>';
-  document.getElementById('r-retake').innerHTML=rh+pb;
+function showRes(rec){var p=rec.status==='Pass';document.getElementById('r-ring').className='sc2 '+(p?'p':'f');document.getElementById('r-pct').className='spct '+(p?'p':'f');document.getElementById('r-pct').textContent=rec.pct+'%';document.getElementById('r-name').textContent=rec.name;document.getElementById('r-meta').textContent='EMP: '+rec.empId+' | '+rec.date+(rec.isR?' | Retake':'');var st=document.getElementById('r-status');st.className='stb '+(p?'p':'f');st.textContent=p?'✓ PASS — Congratulations!':'✗ FAIL — Dobara koshish karo';document.getElementById('r-total').textContent=rec.total+'/'+rec.max+' ('+rec.pct+'%)';var passPct=D.cfg&&D.cfg.pp?D.cfg.pp:80;var fi=[],h='';rec.secs.forEach(function(s,i){var sp=s.pct>=passPct;if(!sp)fi.push(i);var col=sp?'#388E3C':'var(--r)';h+='<div class="srr"><div class="srd" style="background:'+col+'"></div><div class="srn">'+s.section+'</div><div style="font-size:11px;color:#9E7070">'+s.correct+'/'+s.total+'</div><div class="mb"><div class="mf" style="width:'+s.pct+'%;background:'+col+'"></div></div><div style="font-size:11px;font-weight:800;color:'+col+';width:32px;text-align:right">'+s.pct+'%</div></div>';});document.getElementById('r-secs').innerHTML=h;var rh='';if(fi.length>0){rh='<div class="rtk"><div style="font-size:13px;font-weight:800;color:#E65100;margin-bottom:6px">⚡ Failed Sections — Retake Available</div>'+fi.map(function(i){return'<div style="font-size:12px;color:#BF360C;font-weight:600">• '+rec.secs[i].section+' ('+rec.secs[i].pct+'%)</div>';}).join('')+'<button class="btn bp" style="margin-top:10px;font-size:13px;padding:9px 18px" onclick="doRetake('+JSON.stringify(fi)+')">Sirf Failed Sections Ka Retake →</button></div>';}document.getElementById('r-retake').innerHTML=rh;
+  // No print button for sales officer - only admin can print
+  document.getElementById('r-retake').innerHTML=rh;
   ss('sr');
   // Anti-screenshot watermark
   addWatermark();
 }
-function doRetake(idxs){D.rSecs=idxs;D.ans={};var secs=getAS();for(var i=0;i<secs.length;i++)D.ans[i]={};D.cur=0;ss('st');rTest();}
+function doRetake(idxs){
+  D.rSecs=idxs;
+  D.ans={};
+  D.mcqStart=Date.now();
+  D.mcqElapsed=0;
+  D.breakTotal=0;
+  D.onBreak=false;
+  var secs=getAS();
+  for(var i=0;i<secs.length;i++)D.ans[i]={};
+  D.cur=0;
+  try{sessionStorage.removeItem('testState');}catch(e){}
+  ss('st');
+  rTest();
+}
 function sTab(t){['r','q','s'].forEach(function(x){document.getElementById('tb-'+x).classList.add('hi');document.getElementById('tab-'+x).classList.remove('act');});document.getElementById('tb-'+t).classList.remove('hi');document.getElementById('tab-'+t).classList.add('act');if(t==='r')rResults();if(t==='q')rQTab();if(t==='s'){document.getElementById('s-pct').value=D.cfg.pp;if(D.cfg.logo){document.getElementById('lp-img').src=D.cfg.logo;document.getElementById('lp-area').classList.remove('hi');}}}
 function rResults(){rCodePanel();var q=(document.getElementById('f-q').value||'').toLowerCase();var st=document.getElementById('f-st').value;var t=D.res.length;var p=D.res.filter(function(r){return r.status==='Pass'&&!r.isR;}).length;var f=D.res.filter(function(r){return r.status==='Fail'&&!r.isR;}).length;var rt=D.res.filter(function(r){return r.isR;}).length;var avg=t?Math.round(D.res.reduce(function(s,r){return s+r.pct;},0)/t):0;document.getElementById('a-stats').innerHTML='<div class="stt"><div class="sv">'+t+'</div><div class="slb">Total</div></div><div class="stt"><div class="sv g">'+p+'</div><div class="slb">Passed</div></div><div class="stt"><div class="sv r">'+f+'</div><div class="slb">Failed</div></div><div class="stt"><div class="sv a">'+rt+'</div><div class="slb">Retakes</div></div><div class="stt"><div class="sv">'+avg+'%</div><div class="slb">Avg Score</div></div>';var flt=D.res.filter(function(r){return(!q||(r.name.toLowerCase().includes(q)||r.mobile.includes(q)))&&(!st||(st==='Retake'?r.isR:r.status===st));}).slice().reverse();if(!flt.length){document.getElementById('r-tbody').innerHTML='<tr><td colspan="9" style="text-align:center;color:#9E7070;padding:24px">Koi result nahi</td></tr>';return;}document.getElementById('r-tbody').innerHTML=flt.map(function(r,i){var sb=r.isR?'<span class="bdg br">Retake</span>':'<span class="bdg '+(r.status==='Pass'?'bp2':'bf')+'">'+r.status+'</span>';return'<tr><td>'+(i+1)+'</td><td><b>'+r.name+'</b></td><td>'+r.empId+'</td><td>'+r.mobile+'</td><td>'+r.date+'</td><td>'+r.total+'/'+r.max+'</td><td><b>'+r.pct+'%</b></td><td>'+sb+'</td><td style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn bo bsm" onclick="openD('+r.id+')">Detail</button><button class="btn bsm" style="color:var(--r);border:1.5px solid var(--rm)" onclick="delR('+r.id+')">Del</button></td></tr>';}).join('');}
 function openD(id){
