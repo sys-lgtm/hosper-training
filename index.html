@@ -875,7 +875,36 @@ function pickA(qi,oi,el){D.ans[D.cur][qi]=oi;var c=document.getElementById('qc-'
 function chkAll(){var sec=getAS()[D.cur];var ok=true;sec.questions.forEach(function(q,qi){if(D.ans[D.cur][qi]===undefined){ok=false;var c=document.getElementById('qc-'+qi);c.classList.add('flg');setTimeout(function(){c.classList.remove('flg');},600);}});if(!ok)alert('Saare questions ka jawab zaroori hai!');return ok;}
 function prevS(){clearInterval(D.tmr);D.cur--;saveTestState();rTest();}
 function nextS(){if(!chkAll())return;clearInterval(D.tmr);D.cur++;saveTestState();rTest();}
-function submitT(){if(!chkAll())return;clearInterval(D.tmr);D.testDuration=getMCQDuration();var secs=getAS();var tQ=0,tC=0,ss2=[];secs.forEach(function(sec,si){var c=0,wq=[];sec.questions.forEach(function(q,qi){var a=D.ans[si][qi];var ok=a!==undefined&&q.options[a]&&q.options[a].correct;if(ok)c++;else wq.push({question:q.question,chosenText:(a!==undefined&&q.options[a])?q.options[a].text:'—',correctText:q.options.filter(function(o){return o.correct;})[0].text,allOptions:q.options});});tQ+=sec.questions.length;tC+=c;ss2.push({section:sec.section,correct:c,total:sec.questions.length,pct:Math.round(c/sec.questions.length*100),wrongQ:wq});});var fSecs,oPct;if(D.rSecs){var prev=null;for(var i=D.res.length-1;i>=0;i--){if(D.res[i].mobile===D.cand.mobile&&!D.res[i].isR){prev=D.res[i];break;}}fSecs=prev?prev.secs.slice():[];D.rSecs.forEach(function(oi,si){fSecs[oi]=ss2[si];});tC=fSecs.reduce(function(s,x){return s+x.correct;},0);tQ=fSecs.reduce(function(s,x){return s+x.total;},0);oPct=Math.round(tC/tQ*100);}else{fSecs=ss2;oPct=Math.round(tC/tQ*100);}var rec={id:Date.now(),name:D.cand.name,empId:D.cand.empId,mobile:D.cand.mobile,email:D.cand.email,designation:D.cand.designation,state:D.cand.state,date:D.cand.date,testDuration:D.testDuration||0,breakTotal:D.breakTotal||0,total:tC,max:tQ,pct:oPct,status:oPct>=D.cfg.pp?'Pass':'Fail',isR:!!D.rSecs,secs:fSecs};D.res.push(rec);save();try{sessionStorage.removeItem('testState');}catch(e){}
+function submitT(){if(!chkAll())return;clearInterval(D.tmr);D.testDuration=getMCQDuration();var secs=getAS();var tQ=0,tC=0,ss2=[];secs.forEach(function(sec,si){var c=0,wq=[];sec.questions.forEach(function(q,qi){var a=D.ans[si][qi];var ok=a!==undefined&&q.options[a]&&q.options[a].correct;if(ok)c++;else wq.push({question:q.question,chosenText:(a!==undefined&&q.options[a])?q.options[a].text:'—',correctText:q.options.filter(function(o){return o.correct;})[0].text,allOptions:q.options});});tQ+=sec.questions.length;tC+=c;ss2.push({section:sec.section,correct:c,total:sec.questions.length,pct:Math.round(c/sec.questions.length*100),wrongQ:wq});});var fSecs,oPct;if(D.rSecs){
+  // Find the LATEST result for this mobile (any attempt)
+  var prev=null;
+  for(var i=D.res.length-1;i>=0;i--){
+    if(D.res[i].mobile===D.cand.mobile){
+      prev=D.res[i];
+      break;
+    }
+  }
+  // Start with previous full section scores
+  fSecs=prev&&prev.secs&&prev.secs.length>0 ? JSON.parse(JSON.stringify(prev.secs)) : [];
+  // Ensure fSecs has all sections (fill missing with empty)
+  if(fSecs.length===0){
+    D.mcq.forEach(function(m){
+      fSecs.push({section:m.section,correct:0,total:m.questions.length,pct:0,wrongQ:[]});
+    });
+  }
+  // Overwrite ONLY the retaken sections with new scores
+  D.rSecs.forEach(function(origIdx,newIdx){
+    if(origIdx < fSecs.length && newIdx < ss2.length){
+      fSecs[origIdx] = ss2[newIdx];
+    }
+  });
+  tC=fSecs.reduce(function(s,x){return s+(x.correct||0);},0);
+  tQ=fSecs.reduce(function(s,x){return s+(x.total||0);},0);
+  oPct=tQ>0?Math.round(tC/tQ*100):0;
+}else{
+  fSecs=ss2;
+  oPct=Math.round(tC/tQ*100);
+}var rec={id:Date.now(),name:D.cand.name,empId:D.cand.empId,mobile:D.cand.mobile,email:D.cand.email,designation:D.cand.designation,state:D.cand.state,date:D.cand.date,testDuration:D.testDuration||0,breakTotal:D.breakTotal||0,total:tC,max:tQ,pct:oPct,status:oPct>=D.cfg.pp?'Pass':'Fail',isR:!!D.rSecs,secs:fSecs};D.res.push(rec);save();try{sessionStorage.removeItem('testState');}catch(e){}
   // Save submission record to prevent re-test
   var failIdxs=rec.secs.map(function(s,i){return s.pct<D.cfg.pp?i:-1;}).filter(function(i){return i>=0;});
   var mobKey=rec.mobile.replace(/\D/g,'');
@@ -902,7 +931,7 @@ function submitT(){if(!chkAll())return;clearInterval(D.tmr);D.testDuration=getMC
   });
   showRes(rec);
 }
-function showRes(rec){var p=rec.status==='Pass';document.getElementById('r-ring').className='sc2 '+(p?'p':'f');document.getElementById('r-pct').className='spct '+(p?'p':'f');document.getElementById('r-pct').textContent=rec.pct+'%';document.getElementById('r-name').textContent=rec.name;document.getElementById('r-meta').textContent='EMP: '+rec.empId+' | '+rec.date+(rec.isR?' | Retake':'');var st=document.getElementById('r-status');st.className='stb '+(p?'p':'f');st.textContent=p?'✓ PASS — Congratulations!':'✗ FAIL — Dobara koshish karo';document.getElementById('r-total').textContent=rec.total+'/'+rec.max+' ('+rec.pct+'%)';var passPct=D.cfg&&D.cfg.pp?D.cfg.pp:80;var fi=[],h='';rec.secs.forEach(function(s,i){var sp=s.pct>=passPct;if(!sp)fi.push(i);var col=sp?'#388E3C':'var(--r)';h+='<div class="srr"><div class="srd" style="background:'+col+'"></div><div class="srn">'+s.section+'</div><div style="font-size:11px;color:#9E7070">'+s.correct+'/'+s.total+'</div><div class="mb"><div class="mf" style="width:'+s.pct+'%;background:'+col+'"></div></div><div style="font-size:11px;font-weight:800;color:'+col+';width:32px;text-align:right">'+s.pct+'%</div></div>';});document.getElementById('r-secs').innerHTML=h;var rh='';if(fi.length>0){rh='<div class="rtk"><div style="font-size:13px;font-weight:800;color:#E65100;margin-bottom:6px">⚡ Failed Sections — Retake Available</div>'+fi.map(function(i){return'<div style="font-size:12px;color:#BF360C;font-weight:600">• '+rec.secs[i].section+' ('+rec.secs[i].pct+'%)</div>';}).join('')+'<button class="btn bp" style="margin-top:10px;font-size:13px;padding:9px 18px" onclick="doRetake('+JSON.stringify(fi)+')">Sirf Failed Sections Ka Retake →</button></div>';}document.getElementById('r-retake').innerHTML=rh;
+function showRes(rec){var p=rec.status==='Pass';document.getElementById('r-ring').className='sc2 '+(p?'p':'f');document.getElementById('r-pct').className='spct '+(p?'p':'f');document.getElementById('r-pct').textContent=rec.pct+'%';document.getElementById('r-name').textContent=rec.name;document.getElementById('r-meta').textContent='EMP: '+rec.empId+' | '+rec.date+(rec.isR?' | Retake':'');var st=document.getElementById('r-status');st.className='stb '+(p?'p':'f');st.textContent=p?'✓ PASS — Congratulations!':'✗ FAIL — Dobara koshish karo';document.getElementById('r-total').textContent=rec.total+'/'+rec.max+' ('+rec.pct+'%)';var passPct=D.cfg&&D.cfg.pp?parseInt(D.cfg.pp):80;var fi=[],h='';rec.secs.forEach(function(s,i){var sp=s.pct>=passPct;if(!sp)fi.push(i);var col=sp?'#388E3C':'var(--r)';h+='<div class="srr"><div class="srd" style="background:'+col+'"></div><div class="srn">'+s.section+'</div><div style="font-size:11px;color:#9E7070">'+s.correct+'/'+s.total+'</div><div class="mb"><div class="mf" style="width:'+s.pct+'%;background:'+col+'"></div></div><div style="font-size:11px;font-weight:800;color:'+col+';width:32px;text-align:right">'+s.pct+'%</div></div>';});document.getElementById('r-secs').innerHTML=h;var rh='';if(fi.length>0){rh='<div class="rtk"><div style="font-size:13px;font-weight:800;color:#E65100;margin-bottom:6px">⚡ Failed Sections — Retake Available</div>'+fi.map(function(i){return'<div style="font-size:12px;color:#BF360C;font-weight:600">• '+rec.secs[i].section+' ('+rec.secs[i].pct+'%)</div>';}).join('')+'<button class="btn bp" style="margin-top:10px;font-size:13px;padding:9px 18px" onclick="doRetake('+JSON.stringify(fi)+')">Sirf Failed Sections Ka Retake →</button></div>';}document.getElementById('r-retake').innerHTML=rh;
   // If passed - show congratulations message
   if(p){
     rh+='<div style="background:#E8F5E9;border-radius:10px;padding:14px;margin-top:12px;text-align:center;font-size:13px;font-weight:700;color:#2E7D32">🎉 Aapne test pass kar liya! Admin se result lein.</div>';
