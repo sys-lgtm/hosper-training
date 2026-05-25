@@ -771,12 +771,11 @@ function load(){
   });
 }
 function save(){
-  // Convert to plain arrays before saving to Firebase
-  var mcqToSave=JSON.parse(JSON.stringify(D.mcq));
-  var resToSave=JSON.parse(JSON.stringify(D.res));
-  FB_MCQ.set(mcqToSave);
-  FB_RES.set(resToSave);
-  try{localStorage.setItem('hc',JSON.stringify(D.cfg));}catch(e){}
+  try{
+    if(D.mcq&&D.mcq.length>0) FB_MCQ.set(JSON.parse(JSON.stringify(D.mcq)));
+    if(D.res&&D.res.length>0) FB_RES.set(JSON.parse(JSON.stringify(D.res)));
+    localStorage.setItem('hc',JSON.stringify(D.cfg));
+  }catch(e){console.error('Save error:',e);}
   showSync('✓ Synced!','#388E3C');
 }
 function applyLogo(){if(!D.cfg)return;var lg=D.cfg.logo;if(lg){['l','al','t','ab'].forEach(function(x){var el=document.getElementById('logo-'+x);var fb=document.getElementById('logo-'+x+'f');if(el){el.src=lg;el.classList.remove('hi');}if(fb)fb.classList.add('hi');});var lp=document.getElementById('lp-img');if(lp){lp.src=lg;document.getElementById('lp-area').classList.remove('hi');}}}
@@ -989,7 +988,39 @@ function doRetake(idxs){
   ss('st');
   rTest();
 }
-function sTab(t){['r','q','s'].forEach(function(x){document.getElementById('tb-'+x).classList.add('hi');document.getElementById('tab-'+x).classList.remove('act');});document.getElementById('tb-'+t).classList.remove('hi');document.getElementById('tab-'+t).classList.add('act');if(t==='r')rResults();if(t==='q')rQTab();if(t==='s'){document.getElementById('s-pct').value=D.cfg.pp;if(D.cfg.logo){document.getElementById('lp-img').src=D.cfg.logo;document.getElementById('lp-area').classList.remove('hi');}}}
+function sTab(t){
+  ['r','q','s'].forEach(function(x){
+    document.getElementById('tb-'+x).classList.add('hi');
+    document.getElementById('tab-'+x).classList.remove('act');
+  });
+  document.getElementById('tb-'+t).classList.remove('hi');
+  document.getElementById('tab-'+t).classList.add('act');
+  if(t==='r') rResults();
+  if(t==='q'){
+    // Force fresh load from Firebase then render
+    document.getElementById('sec-acc').innerHTML='<div style="text-align:center;padding:30px;color:#9E7070"><div style="font-size:28px">⏳</div><div style="font-weight:700;margin-top:8px">Loading sections...</div></div>';
+    FB_MCQ.once('value').then(function(s){
+      var m=s.val();
+      if(m){
+        var arr=Array.isArray(m)?m:Object.keys(m).sort(function(a,b){return parseInt(a)-parseInt(b);}).map(function(k){return m[k];}).filter(function(x){return x&&x.section;});
+        if(arr.length>0) D.mcq=arr;
+      }
+      if(!D.mcq||D.mcq.length===0){
+        D.mcq=JSON.parse(JSON.stringify(MCQ));
+        FB_MCQ.set(D.mcq);
+      }
+      rQTab();
+    }).catch(function(e){
+      console.error('Firebase error:',e);
+      if(!D.mcq||D.mcq.length===0) D.mcq=JSON.parse(JSON.stringify(MCQ));
+      rQTab();
+    });
+  }
+  if(t==='s'){
+    document.getElementById('s-pct').value=D.cfg.pp||80;
+    if(D.cfg.logo){document.getElementById('lp-img').src=D.cfg.logo;document.getElementById('lp-area').classList.remove('hi');}
+  }
+}
 function rResults(){rCodePanel();var q=(document.getElementById('f-q').value||'').toLowerCase();var st=document.getElementById('f-st').value;var t=D.res.length;var p=D.res.filter(function(r){return r.status==='Pass'&&!r.isR;}).length;var f=D.res.filter(function(r){return r.status==='Fail'&&!r.isR;}).length;var rt=D.res.filter(function(r){return r.isR;}).length;var avg=t?Math.round(D.res.reduce(function(s,r){return s+r.pct;},0)/t):0;document.getElementById('a-stats').innerHTML='<div class="stt"><div class="sv">'+t+'</div><div class="slb">Total</div></div><div class="stt"><div class="sv g">'+p+'</div><div class="slb">Passed</div></div><div class="stt"><div class="sv r">'+f+'</div><div class="slb">Failed</div></div><div class="stt"><div class="sv a">'+rt+'</div><div class="slb">Retakes</div></div><div class="stt"><div class="sv">'+avg+'%</div><div class="slb">Avg Score</div></div>';var flt=D.res.filter(function(r){return(!q||(r.name.toLowerCase().includes(q)||r.mobile.includes(q)))&&(!st||(st==='Retake'?r.isR:r.status===st));}).slice().reverse();if(!flt.length){document.getElementById('r-tbody').innerHTML='<tr><td colspan="9" style="text-align:center;color:#9E7070;padding:24px">Koi result nahi</td></tr>';return;}document.getElementById('r-tbody').innerHTML=flt.map(function(r,i){
   var sb=r.isR?'<span class="bdg br">Retake</span>':'<span class="bdg '+(r.status==='Pass'?'bp2':'bf')+'">'+r.status+'</span>';
   return'<tr>'+
@@ -1111,24 +1142,42 @@ function rQTab(){
   var h='';D.mcq.forEach(function(sec,si){h+='<div class="acc"><div class="ach" onclick="tAcc('+si+')"><div class="act2">'+sec.section+'</div><span class="acn">'+sec.questions.length+'</span><button class="btn bsm" style="color:var(--r);border:1.5px solid var(--rm)" onclick="event.stopPropagation();delSec('+si+')">Del</button><span class="acv" id="av-'+si+'">▼</span></div><div class="acb" id="ab-'+si+'"><div style="margin-bottom:12px;padding:10px 12px;background:var(--rp);border-radius:9px;border:2px solid var(--rl)"><div style="font-size:11px;font-weight:800;color:var(--r);margin-bottom:7px">🎬 Video Settings</div><div class="vr"><div style="flex:1"><div style="font-size:11px;font-weight:700;color:#9E7070;margin-bottom:3px">Video Link</div><input class="vri" id="vl-'+si+'" value="'+(sec.videoLink||'')+'" placeholder="Drive/YouTube link" style="width:100%"></div><div><div style="font-size:11px;font-weight:700;color:#9E7070;margin-bottom:3px">Min</div><input class="vri" id="vd-'+si+'" type="number" min="0" value="'+(sec.videoDuration||0)+'" style="width:60px;text-align:center"></div><button class="btn bp bsm" onclick="saveVL('+si+')">Save</button></div>'+(sec.videoLink?'<div style="font-size:11px;color:#388E3C;font-weight:700;margin-top:3px">✓ Video set — '+sec.videoDuration+' min</div>':'')+'</div>'+sec.questions.map(function(q,qi){return'<div class="qr"><div class="qrn">'+(qi+1)+'</div><div style="flex:1"><div class="qrt">'+q.question+'</div><div class="qro">'+q.options.map(function(o){return'<span class="oc'+(o.correct?' ok':'')+'">'+o.text+(o.correct?' ✓':'')+'</span>';}).join('')+'</div></div><button class="btn bsm" style="color:var(--r);border:1.5px solid var(--rm)" onclick="delQ('+si+','+qi+')">Del</button></div>';}).join('')+'<div class="aqb"><div style="font-size:12px;font-weight:800;color:var(--r);margin-bottom:9px">+ Naya Question</div><input class="aqi" id="nq-'+si+'" placeholder="Question likhein..."><div style="font-size:11px;font-weight:700;color:#5C3030;margin-bottom:5px">Options — Sahi ke aage ● dabayein</div><div class="og">'+[0,1,2,3].map(function(oi){return'<div class="oir" id="oir-'+si+'-'+oi+'"><input type="radio" name="nr-'+si+'" value="'+oi+'" onchange="hlOpt('+si+','+oi+')"><input type="text" id="no-'+si+'-'+oi+'" placeholder="Option '+(oi+1)+'"></div>';}).join('')+'</div><button class="btn bs bsm" style="font-size:13px;padding:8px 14px" onclick="addQ('+si+')">Add Question ✓</button></div></div></div>';});document.getElementById('sec-acc').innerHTML=h;}
 function tAcc(si){var b=document.getElementById('ab-'+si);var a=document.getElementById('av-'+si);b.classList.toggle('op');a.textContent=b.classList.contains('op')?'▲':'▼';}
 function hlOpt(si,oi){[0,1,2,3].forEach(function(i){var r=document.getElementById('oir-'+si+'-'+i);if(r)r.className='oir'+(i===oi?' cs':'');});}
-function saveVL(si){D.mcq[si].videoLink=document.getElementById('vl-'+si).value.trim();D.mcq[si].videoDuration=parseInt(document.getElementById('vd-'+si).value)||0;save();rQTab();setTimeout(function(){var ab=document.getElementById('ab-'+si);if(ab&&!ab.classList.contains('op')){ab.classList.add('op');document.getElementById('av-'+si).textContent='▲';}},50);}
+function saveVL(si){
+  D.mcq[si].videoLink=document.getElementById('vl-'+si).value.trim();
+  D.mcq[si].videoDuration=parseInt(document.getElementById('vd-'+si).value)||0;
+  FB_MCQ.set(JSON.parse(JSON.stringify(D.mcq))).then(function(){
+    showSync('✓ Video link save ho gaya!','#388E3C');
+  });
+  rQTab();
+  setTimeout(function(){var ab=document.getElementById('ab-'+si);if(ab&&!ab.classList.contains('op')){ab.classList.add('op');document.getElementById('av-'+si).textContent='▲';}},50);
+}
 function addSec(){
   var n=document.getElementById('ns-name').value.trim();
   if(!n){alert('Section naam daalein!');return;}
+  if(!D.mcq||D.mcq.length===0){D.mcq=JSON.parse(JSON.stringify(MCQ));}
   D.mcq.push({section:n,videoLink:'',videoDuration:0,questions:[]});
   document.getElementById('ns-name').value='';
-  // Save to Firebase and immediately render
-  FB_MCQ.set(D.mcq).then(function(){
-    showSync('✓ Section add ho gaya!','#388E3C');
+  var mcqCopy=JSON.parse(JSON.stringify(D.mcq));
+  FB_MCQ.set(mcqCopy).then(function(){
+    showSync('✓ Section "'+n+'" add ho gaya!','#388E3C');
+  }).catch(function(e){console.error('Save error:',e);});
+  try{localStorage.setItem('hc',JSON.stringify(D.cfg));}catch(e){}
+  rQTab();
+}
+function delSec(si){
+  conf('"'+D.mcq[si].section+'" delete karein?',D.mcq[si].questions.length+' questions bhi delete honge.',function(){
+    D.mcq.splice(si,1);
+    FB_MCQ.set(JSON.parse(JSON.stringify(D.mcq))).then(function(){
+      showSync('✓ Section delete ho gaya!','#388E3C');
+    });
     rQTab();
   });
-  save();
-  rQTab(); // Render immediately without waiting
 }
-function delSec(si){conf('"'+D.mcq[si].section+'" delete karein?',D.mcq[si].questions.length+' questions bhi delete honge.',function(){D.mcq.splice(si,1);save();rQTab();});}
 function addQ(si){var txt=document.getElementById('nq-'+si).value.trim();if(!txt){alert('Question likhein!');return;}var opts=[],ci=-1;document.querySelectorAll('input[name="nr-'+si+'"]').forEach(function(r,i){if(r.checked)ci=i;});for(var i=0;i<4;i++){var v=document.getElementById('no-'+si+'-'+i).value.trim();if(!v){alert('Saare 4 options bharein!');return;}opts.push({text:v,correct:i===ci});}if(ci===-1){alert('Sahi answer ke radio pe click karein!');return;}D.mcq[si].questions.push({question:txt,options:opts});
-  FB_MCQ.set(D.mcq).then(function(){showSync('✓ Question add ho gaya!','#388E3C');});
-  save();rQTab();
+  FB_MCQ.set(JSON.parse(JSON.stringify(D.mcq))).then(function(){
+    showSync('✓ Question add ho gaya!','#388E3C');
+  });
+  rQTab();
   setTimeout(function(){var ab=document.getElementById('ab-'+si);if(ab&&!ab.classList.contains('op')){ab.classList.add('op');document.getElementById('av-'+si).textContent='▲';}},50);
 }
 function delQ(si,qi){conf('Question delete karein?','"'+D.mcq[si].questions[qi].question.substring(0,50)+'..."',function(){D.mcq[si].questions.splice(qi,1);save();rQTab();});}
