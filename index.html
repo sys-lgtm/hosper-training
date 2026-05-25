@@ -713,7 +713,15 @@ function load(){
     // Load MCQ from Firebase then show restored test
     FB_MCQ.on('value',function(s){
       var m=s.val();
-      if(m&&Array.isArray(m)&&m.length>0)D.mcq=m;
+      var mcqArr=null;
+      if(m){
+        if(Array.isArray(m)&&m.length>0){mcqArr=m;}
+        else if(typeof m==='object'){
+          var keys=Object.keys(m);
+          if(keys.length>0)mcqArr=keys.map(function(k){return m[k];}).filter(function(x){return x&&x.section;});
+        }
+      }
+      if(mcqArr&&mcqArr.length>0){D.mcq=mcqArr;}
       else{D.mcq=JSON.parse(JSON.stringify(MCQ));FB_MCQ.set(D.mcq);}
     });
     FB_RES.on('value',function(s){var r=s.val();D.res=r?(Array.isArray(r)?r:Object.values(r)):[];});
@@ -727,23 +735,47 @@ function load(){
   // Load MCQ from Firebase (syncs to all devices)
   FB_MCQ.on('value',function(s){
     var m=s.val();
-    if(m&&Array.isArray(m)&&m.length>0){D.mcq=m;}
-    else{D.mcq=JSON.parse(JSON.stringify(MCQ));FB_MCQ.set(D.mcq);}
-    // If Questions tab is open, re-render
+    var mcqArr=null;
+    if(m){
+      if(Array.isArray(m)&&m.length>0){
+        mcqArr=m;
+      } else if(typeof m==='object'){
+        // Firebase converts arrays to objects - convert back
+        var keys=Object.keys(m);
+        if(keys.length>0){
+          mcqArr=keys.map(function(k){return m[k];}).filter(function(x){return x&&x.section;});
+        }
+      }
+    }
+    if(mcqArr&&mcqArr.length>0){
+      D.mcq=mcqArr;
+    } else {
+      // First time - save default MCQ to Firebase
+      D.mcq=JSON.parse(JSON.stringify(MCQ));
+      FB_MCQ.set(D.mcq);
+    }
+    // Re-render Questions tab if open
     var qtab=document.getElementById('tab-q');
     if(qtab&&qtab.classList.contains('act')){rQTab();}
   });
   // Load Results from Firebase (syncs to all devices)
   FB_RES.on('value',function(s){
     var r=s.val();
-    D.res=r?(Array.isArray(r)?r:Object.values(r)):[];
+    if(!r){D.res=[];return;}
+    if(Array.isArray(r)){D.res=r.filter(function(x){return x&&x.id;});}
+    else if(typeof r==='object'){D.res=Object.values(r).filter(function(x){return x&&x.id;});}
+    else{D.res=[];}
+    // Re-render results tab if open
+    var rtab=document.getElementById('tab-r');
+    if(rtab&&rtab.classList.contains('act')){rResults();}
   });
 }
 function save(){
-  // MCQ and Results -> Firebase (all devices get update)
-  FB_MCQ.set(D.mcq);
-  FB_RES.set(D.res);
-  // Settings/password -> localStorage only (admin device)
+  // Convert to plain arrays before saving to Firebase
+  var mcqToSave=JSON.parse(JSON.stringify(D.mcq));
+  var resToSave=JSON.parse(JSON.stringify(D.res));
+  FB_MCQ.set(mcqToSave);
+  FB_RES.set(resToSave);
   try{localStorage.setItem('hc',JSON.stringify(D.cfg));}catch(e){}
   showSync('✓ Synced!','#388E3C');
 }
