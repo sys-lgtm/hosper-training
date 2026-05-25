@@ -448,7 +448,7 @@ var FB_CFG=db.ref('config');
 var FB_CODES=db.ref('login_codes');
 var FB_SUBMITTED=db.ref('submitted');
 function showSync(msg,col){var el=document.getElementById('sync-ind');if(el){el.textContent=msg;el.style.background=col||'#388E3C';el.style.display='block';setTimeout(function(){el.style.display='none';},2500);}}
-var D={mcq:[],res:[],cfg:{pp:80,pwd:'hosper2024',logo:LOGO_DATA},cand:{},ans:{},cur:0,rSecs:null,tmr:null,tSec:0,mcqStart:0,mcqElapsed:0,breakStart:0,breakTotal:0,testDuration:0,onBreak:false};
+var D={mcq:JSON.parse(JSON.stringify(MCQ)),res:[],cfg:{pp:80,pwd:'hosper2024',logo:LOGO_DATA},cand:{},ans:{},cur:0,rSecs:null,tmr:null,tSec:0,mcqStart:0,mcqElapsed:0,breakStart:0,breakTotal:0,testDuration:0,onBreak:false};
 
 
 // ===== BREAK SYSTEM =====
@@ -1156,12 +1156,7 @@ function openD(id){
 function delR(id){conf('Is result delete karein?','Undo nahi hoga.',function(){D.res=D.res.filter(function(r){return r.id!==id;});save();rResults();});}
 function clrAll(){conf('Saare results delete karein?','Saara data permanently delete hoga!',function(){D.res=[];save();rResults();});}
 function rQTab(){
-  // If MCQ not loaded yet, show loading and wait
-  if(!D.mcq||D.mcq.length===0){
-    document.getElementById('sec-acc').innerHTML='<div style="text-align:center;padding:30px;color:#9E7070"><div style="font-size:24px;margin-bottom:8px">⏳</div><div style="font-size:14px;font-weight:700">Questions load ho rahe hain...</div></div>';
-    setTimeout(function(){if(document.getElementById('tab-q').classList.contains('act'))rQTab();},1000);
-    return;
-  }
+  if(!D.mcq||D.mcq.length===0) D.mcq=JSON.parse(JSON.stringify(MCQ));
   var h='';D.mcq.forEach(function(sec,si){h+='<div class="acc"><div class="ach" onclick="tAcc('+si+')"><div class="act2">'+sec.section+'</div><span class="acn">'+sec.questions.length+'</span><button class="btn bsm" style="color:var(--r);border:1.5px solid var(--rm)" onclick="event.stopPropagation();delSec('+si+')">Del</button><span class="acv" id="av-'+si+'">▼</span></div><div class="acb" id="ab-'+si+'"><div style="margin-bottom:12px;padding:10px 12px;background:var(--rp);border-radius:9px;border:2px solid var(--rl)"><div style="font-size:11px;font-weight:800;color:var(--r);margin-bottom:7px">🎬 Video Settings</div><div class="vr"><div style="flex:1"><div style="font-size:11px;font-weight:700;color:#9E7070;margin-bottom:3px">Video Link</div><input class="vri" id="vl-'+si+'" value="'+(sec.videoLink||'')+'" placeholder="Drive/YouTube link" style="width:100%"></div><div><div style="font-size:11px;font-weight:700;color:#9E7070;margin-bottom:3px">Min</div><input class="vri" id="vd-'+si+'" type="number" min="0" value="'+(sec.videoDuration||0)+'" style="width:60px;text-align:center"></div><button class="btn bp bsm" onclick="saveVL('+si+')">Save</button></div>'+(sec.videoLink?'<div style="font-size:11px;color:#388E3C;font-weight:700;margin-top:3px">✓ Video set — '+sec.videoDuration+' min</div>':'')+'</div>'+sec.questions.map(function(q,qi){return'<div class="qr"><div class="qrn">'+(qi+1)+'</div><div style="flex:1"><div class="qrt">'+q.question+'</div><div class="qro">'+q.options.map(function(o){return'<span class="oc'+(o.correct?' ok':'')+'">'+o.text+(o.correct?' ✓':'')+'</span>';}).join('')+'</div></div><button class="btn bsm" style="color:var(--r);border:1.5px solid var(--rm)" onclick="delQ('+si+','+qi+')">Del</button></div>';}).join('')+'<div class="aqb"><div style="font-size:12px;font-weight:800;color:var(--r);margin-bottom:9px">+ Naya Question</div><input class="aqi" id="nq-'+si+'" placeholder="Question likhein..."><div style="font-size:11px;font-weight:700;color:#5C3030;margin-bottom:5px">Options — Sahi ke aage ● dabayein</div><div class="og">'+[0,1,2,3].map(function(oi){return'<div class="oir" id="oir-'+si+'-'+oi+'"><input type="radio" name="nr-'+si+'" value="'+oi+'" onchange="hlOpt('+si+','+oi+')"><input type="text" id="no-'+si+'-'+oi+'" placeholder="Option '+(oi+1)+'"></div>';}).join('')+'</div><button class="btn bs bsm" style="font-size:13px;padding:8px 14px" onclick="addQ('+si+')">Add Question ✓</button></div></div></div>';});document.getElementById('sec-acc').innerHTML=h;}
 function tAcc(si){var b=document.getElementById('ab-'+si);var a=document.getElementById('av-'+si);b.classList.toggle('op');a.textContent=b.classList.contains('op')?'▲':'▼';}
 function hlOpt(si,oi){[0,1,2,3].forEach(function(i){var r=document.getElementById('oir-'+si+'-'+i);if(r)r.className='oir'+(i===oi?' cs':'');});}
