@@ -733,30 +733,41 @@ function load(){
   try{var c=localStorage.getItem('hc');if(c)Object.assign(D.cfg,JSON.parse(c));}catch(e){}
   applyLogo();
   // Load MCQ from Firebase (syncs to all devices)
-  FB_MCQ.on('value',function(s){
+  FB_MCQ.once('value').then(function(s){
     var m=s.val();
-    var mcqArr=null;
+    var arr=null;
     if(m){
-      if(Array.isArray(m)&&m.length>0){
-        mcqArr=m;
-      } else if(typeof m==='object'){
-        // Firebase converts arrays to objects - convert back
+      if(Array.isArray(m)&&m.length>0) arr=m;
+      else if(typeof m==='object'){
         var keys=Object.keys(m);
-        if(keys.length>0){
-          mcqArr=keys.map(function(k){return m[k];}).filter(function(x){return x&&x.section;});
-        }
+        if(keys.length>0) arr=keys.sort(function(a,b){return parseInt(a)-parseInt(b);}).map(function(k){return m[k];}).filter(function(x){return x&&x.section;});
       }
     }
-    if(mcqArr&&mcqArr.length>0){
-      D.mcq=mcqArr;
+    if(arr&&arr.length>0){
+      D.mcq=arr;
     } else {
-      // First time - save default MCQ to Firebase
+      // Firebase empty - push default MCQ
       D.mcq=JSON.parse(JSON.stringify(MCQ));
-      FB_MCQ.set(D.mcq);
+      FB_MCQ.set(JSON.parse(JSON.stringify(D.mcq)));
     }
-    // Re-render Questions tab if open
-    var qtab=document.getElementById('tab-q');
-    if(qtab&&qtab.classList.contains('act')){rQTab();}
+  }).catch(function(){
+    if(!D.mcq||D.mcq.length===0) D.mcq=JSON.parse(JSON.stringify(MCQ));
+  });
+  // Realtime listener for MCQ updates
+  FB_MCQ.on('value',function(s){
+    var m=s.val();
+    if(!m) return;
+    var arr=null;
+    if(Array.isArray(m)&&m.length>0) arr=m;
+    else if(typeof m==='object'){
+      var keys=Object.keys(m);
+      if(keys.length>0) arr=keys.sort(function(a,b){return parseInt(a)-parseInt(b);}).map(function(k){return m[k];}).filter(function(x){return x&&x.section;});
+    }
+    if(arr&&arr.length>0){
+      D.mcq=arr;
+      var qtab=document.getElementById('tab-q');
+      if(qtab&&qtab.classList.contains('act')) rQTab();
+    }
   });
   // Load Results from Firebase (syncs to all devices)
   FB_RES.on('value',function(s){
@@ -997,23 +1008,35 @@ function sTab(t){
   document.getElementById('tab-'+t).classList.add('act');
   if(t==='r') rResults();
   if(t==='q'){
-    // Force fresh load from Firebase then render
-    document.getElementById('sec-acc').innerHTML='<div style="text-align:center;padding:30px;color:#9E7070"><div style="font-size:28px">⏳</div><div style="font-weight:700;margin-top:8px">Loading sections...</div></div>';
+    // Show sections immediately from D.mcq (no waiting)
+    if(!D.mcq||D.mcq.length===0){
+      D.mcq=JSON.parse(JSON.stringify(MCQ));
+    }
+    rQTab();
+    // Also sync with Firebase in background
     FB_MCQ.once('value').then(function(s){
       var m=s.val();
+      var arr=null;
       if(m){
-        var arr=Array.isArray(m)?m:Object.keys(m).sort(function(a,b){return parseInt(a)-parseInt(b);}).map(function(k){return m[k];}).filter(function(x){return x&&x.section;});
-        if(arr.length>0) D.mcq=arr;
+        if(Array.isArray(m)&&m.length>0) arr=m;
+        else if(typeof m==='object'){
+          var keys=Object.keys(m);
+          if(keys.length>0){
+            arr=keys.sort(function(a,b){return parseInt(a)-parseInt(b);}).map(function(k){return m[k];}).filter(function(x){return x&&x.section;});
+          }
+        }
       }
-      if(!D.mcq||D.mcq.length===0){
-        D.mcq=JSON.parse(JSON.stringify(MCQ));
-        FB_MCQ.set(D.mcq);
+      if(arr&&arr.length>0){
+        D.mcq=arr;
+        rQTab(); // Re-render with Firebase data
+      } else {
+        // No data in Firebase - push default MCQ now
+        FB_MCQ.set(JSON.parse(JSON.stringify(D.mcq))).then(function(){
+          showSync('✓ MCQ data Firebase mein save ho gaya!','#388E3C');
+        });
       }
-      rQTab();
     }).catch(function(e){
       console.error('Firebase error:',e);
-      if(!D.mcq||D.mcq.length===0) D.mcq=JSON.parse(JSON.stringify(MCQ));
-      rQTab();
     });
   }
   if(t==='s'){
